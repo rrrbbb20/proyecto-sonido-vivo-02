@@ -3,8 +3,9 @@ import { NavLink } from "react-router-dom";
 
 function Navegacion() {
   return (
-    /* bg-white da el fondo blanco, shadow-sm le da una sombra suave para separarlo del contenido */
+   
     <Navbar expand="md" className="bg-white shadow-sm mb-4">
+        { /* bg-white da el fondo blanco, shadow-sm le da una sombra suave para separarlo del contenido */}
       <Container>
         {/* Botón hamburguesa de Bootstrap para móviles */}
         <Navbar.Toggle aria-controls="menu-principal" />

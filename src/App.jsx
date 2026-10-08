@@ -1,122 +1,36 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Routes, Route } from "react-router-dom"; 
+import Cabecera from "./components/Cabecera";
+import Navegacion from "./components/Navegacion";
+// import Registro from "./pages/Registro";
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      {/* 1. Componentes estáticos: Siempre se ven en todas las páginas */}
+      <Cabecera />
+      <Navegacion />
 
-      <div className="ticks"></div>
+      {/* 2. Contenedor principal dinámico */}
+      <main className="container py-4 mb-5">
+        
+        {/* <Routes> actúa como un "televisor" que cambia de canal */}
+        <Routes>
+          {/* Cada <Route> es un canal diferente. El "path" es la URL y el "element" es lo que muestra */}
+          
+          <Route path="/" element={<h2 className="text-center mt-5">Bienvenido a la página de Inicio</h2>} />
+          <Route path="/catalogo" element={<h2 className="text-center mt-5">Aquí irá la grilla de productos</h2>} />
+          <Route path="/ubicacion" element={<h2 className="text-center mt-5">Aquí irá el mapa de Ubicación</h2>} />
+          <Route path="/contacto" element={<h2 className="text-center mt-5">Aquí irá el formulario de Contacto</h2>} />
+          <Route path="/login" element={<h2 className="text-center mt-5">Aquí irá el Iniciar Sesión</h2>} />
+          <Route path="/carrito" element={<h2 className="text-center mt-5">Aquí irá el Carrito de Compras</h2>} />
+          
+          {/* Ruta especial: Si el usuario escribe una URL que no existe (Error 404) */}
+          <Route path="*" element={<h2 className="text-center text-danger mt-5">Error 404: Página no encontrada</h2>} />
+        </Routes>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+      </main>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
