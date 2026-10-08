@@ -1,19 +1,24 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom"; // Importamos Link para el logo
 
 function Navegacion() {
   return (
-   
-    <Navbar expand="md" className="bg-white shadow-sm mb-4">
-        { /* bg-white da el fondo blanco, shadow-sm le da una sombra suave para separarlo del contenido */}
+    
+    <Navbar expand="md" className="bg-white shadow-sm border-bottom py-3 mb-4">
       <Container>
-        {/* Botón hamburguesa de Bootstrap para móviles */}
+        
+        {/* LOGO a la izquierda: as={Link} hace que funcione como un enlace al inicio sin recargar */}
+        <Navbar.Brand as={Link} to="/" className="fw-bold fs-3 text-dark">
+          Sonido Vivo
+        </Navbar.Brand>
+
+        {/* Botón hamburguesa para móviles */}
         <Navbar.Toggle aria-controls="menu-principal" />
         
         {/* Contenedor colapsable del menú */}
         <Navbar.Collapse id="menu-principal">
-          <Nav className="w-100 justify-content-center gap-3">
-            {/* Las clases nav-link son de Bootstrap. NavLink de React Router las activa automáticamente */}
+          {/* ms-auto empuja todos los enlaces hacia la derecha */}
+          <Nav className="ms-auto gap-3 align-items-center">
             <NavLink className="nav-link text-dark" to="/">Inicio</NavLink>
             <NavLink className="nav-link text-dark" to="/catalogo">Catálogo</NavLink>
             <NavLink className="nav-link text-dark" to="/ubicacion">Ubicación</NavLink>
@@ -23,9 +28,11 @@ function Navegacion() {
             
           </Nav>
         </Navbar.Collapse>
+
       </Container>
     </Navbar>
   );
 }
 
 export default Navegacion;
+
