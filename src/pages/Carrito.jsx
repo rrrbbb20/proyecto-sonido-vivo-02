@@ -64,12 +64,16 @@ function Carrito() {
 
     setCarrito(carritoActualizado);
   }
-
-  
-
+ 
   // Calcula el subtotal sumando precio por cantidad de cada producto
   const subtotal = carrito.reduce(
     (total, producto) => total + producto.precio * producto.cantidad,
+    0
+  );
+
+  // Calcula la cantidad total de unidades agregadas al carrito
+  const cantidadTotal = carrito.reduce(
+    (total, producto) => total + producto.cantidad,
     0
   );
 
@@ -134,6 +138,7 @@ function Carrito() {
             <h2 className="h5">Resumen del pedido</h2>
 
             <p>Productos en el carrito: {carrito.length}</p>
+            <p>Cantidad total: {cantidadTotal}</p>
 
             <p>Subtotal: ${subtotal}</p>
 
@@ -143,7 +148,7 @@ function Carrito() {
               Total: ${subtotal}
             </p>
 
-            <Button variant="primary" className="w-100">
+            <Button variant="primary" className="w-100" disabled={carrito.length === 0}>
               Continuar compra
             </Button>
           </div>
