@@ -2,6 +2,8 @@ import { Routes, Route } from "react-router-dom";
 import Cabecera from "./components/Cabecera";
 import Navegacion from "./components/Navegacion";
 import Registro from "./pages/Registro";
+import Catalogo from "./pages/Catalogo";
+import Carrito from "./pages/Carrito";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
           
 
           <Route path="/registro" element={<Registro />} />
+          <Route path="/catalogo" element={<Catalogo />} />
+          <Route path="/carrito" element={<Carrito />} />
           
         </Routes>
 
