@@ -29,7 +29,36 @@ function Catalogo() {
         </Row>
       </Form>
 
-      <h2>Productos</h2>
+      <h2 className="mb-3">Productos</h2>
+
+      <Row className="g-4">
+        <Col xs={12} md={6} lg={4}>
+          <div className="border rounded p-3 h-100">
+            <h3 className="h5">Guitarra Eléctrica Epiphone SG Standard</h3>
+            <p>Guitarras eléctricas</p>
+            <p>Stock: 3</p>
+            <p>$319.990</p>
+          </div>
+        </Col>
+
+        <Col xs={12} md={6} lg={4}>
+          <div className="border rounded p-3 h-100">
+            <h3 className="h5">Batería Acústica Pearl Roadshow</h3>
+            <p>Baterías</p>
+            <p>Stock: 2</p>
+            <p>$599.990</p>
+          </div>
+        </Col>
+
+        <Col xs={12} md={6} lg={4}>
+          <div className="border rounded p-3 h-100">
+            <h3 className="h5">Micrófono Condensador Audio-Tech AT2020</h3>
+            <p>Micrófonos</p>
+            <p>Stock: 4</p>
+            <p>$199.990</p>
+          </div>
+        </Col>
+      </Row>
     </Container>
   );
 }
