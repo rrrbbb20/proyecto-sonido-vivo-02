@@ -1,29 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import ItemCarrito from "../components/ItemCarrito";
 
 function Carrito() {
-  // Estado que almacena los productos agregados al carrito
-  const [carrito, setCarrito] = useState([
-    {
-      id: 1,
-      nombre: "Guitarra Eléctrica Epiphone SG Standard",
-      precio: 319990,
-      cantidad: 1,
-    },
-    {
-      id: 2,
-      nombre: "Batería Acústica Pearl Roadshow",
-      precio: 599990,
-      cantidad: 1,
-    },
-    {
-      id: 3,
-      nombre: "Micrófono Condensador Audio-Tech AT2020",
-      precio: 199990,
-      cantidad: 2,
-    },
-  ]);
+  // Estado que recupera el carrito guardado en localStorage
+  const [carrito, setCarrito] = useState(() => {
+    const carritoGuardado = localStorage.getItem("carritoSonidoVivo");
+
+    return carritoGuardado ? JSON.parse(carritoGuardado) : [
+        {
+        id: 1,
+        nombre: "Guitarra Eléctrica Epiphone SG Standard",
+        precio: 319990,
+        cantidad: 1,
+        },
+        {
+        id: 2,
+        nombre: "Batería Acústica Pearl Roadshow",
+        precio: 599990,
+        cantidad: 1,
+        },
+        {
+        id: 3,
+        nombre: "Micrófono Condensador Audio-Tech AT2020",
+        precio: 199990,
+        cantidad: 2,
+        },
+    ];
+  });
+
+  // Guarda el carrito en localStorage cada vez que cambia
+  useEffect(() => {
+    localStorage.setItem(
+        "carritoSonidoVivo",
+        JSON.stringify(carrito)
+    );
+  }, [carrito]);
 
   // Aumenta en una unidad la cantidad del producto seleccionado
   function aumentarCantidad(id) {
