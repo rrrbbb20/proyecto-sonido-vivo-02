@@ -9,6 +9,18 @@ function Carrito() {
       precio: 319990,
       cantidad: 1,
     },
+    {
+      id: 2,
+      nombre: "Batería Acústica Pearl Roadshow",
+      precio: 599990,
+      cantidad: 1,
+    },
+    {
+      id: 3,
+      nombre: "Micrófono Condensador Audio-Tech AT2020",
+      precio: 199990,
+      cantidad: 2,
+    },
   ]);
 
   return (
@@ -25,11 +37,13 @@ function Carrito() {
                 Aún no hay productos agregados al carrito.
               </p>
             ) : (
-              <div>
-                <h3 className="h6">{carrito[0].nombre}</h3>
-                <p>Precio: ${carrito[0].precio}</p>
-                <p>Cantidad: {carrito[0].cantidad}</p>
-              </div>
+              carrito.map((producto) => (
+                <div key={producto.id} className="border-bottom py-3">
+                  <h3 className="h6">{producto.nombre}</h3>
+                  <p>Precio: ${producto.precio}</p>
+                  <p>Cantidad: {producto.cantidad}</p>
+                </div>
+              ))
             )}
           </div>
         </Col>
@@ -38,13 +52,9 @@ function Carrito() {
           <div className="border rounded p-3">
             <h2 className="h5">Resumen del pedido</h2>
 
-            <p>Subtotal: ${carrito[0].precio}</p>
+            <p>Productos en el carrito: {carrito.length}</p>
 
             <hr />
-
-            <p className="fw-bold">
-              Total: ${carrito[0].precio}
-            </p>
 
             <Button variant="primary" className="w-100">
               Continuar compra
