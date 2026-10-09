@@ -1,5 +1,33 @@
 import { Container, Form, Row, Col } from "react-bootstrap";
 
+// Productos disponibles en el catálogo
+const productos = [
+  {
+    id: 1,
+    nombre: "Guitarra Eléctrica Epiphone SG Standard",
+    categoria: "guitarras",
+    categoriaNombre: "Guitarras eléctricas",
+    precio: 319990,
+    stock: 3,
+  },
+  {
+    id: 2,
+    nombre: "Batería Acústica Pearl Roadshow",
+    categoria: "baterias",
+    categoriaNombre: "Baterías",
+    precio: 599990,
+    stock: 2,
+  },
+  {
+    id: 3,
+    nombre: "Micrófono Condensador Audio-Tech AT2020",
+    categoria: "microfonos",
+    categoriaNombre: "Micrófonos",
+    precio: 199990,
+    stock: 4,
+  },
+];
+
 function Catalogo() {
   return (
     <Container className="py-4">
@@ -32,32 +60,20 @@ function Catalogo() {
       <h2 className="mb-3">Productos</h2>
 
       <Row className="g-4">
-        <Col xs={12} md={6} lg={4}>
-          <div className="border rounded p-3 h-100">
-            <h3 className="h5">Guitarra Eléctrica Epiphone SG Standard</h3>
-            <p>Guitarras eléctricas</p>
-            <p>Stock: 3</p>
-            <p>$319.990</p>
-          </div>
-        </Col>
+        {/* Se recorre el arreglo para mostrar todos los productos */}
+        {productos.map((producto) => (
+          <Col key={producto.id} xs={12} md={6} lg={4}>
+            <div className="border rounded p-3 h-100">
+              <h3 className="h5">{producto.nombre}</h3>
 
-        <Col xs={12} md={6} lg={4}>
-          <div className="border rounded p-3 h-100">
-            <h3 className="h5">Batería Acústica Pearl Roadshow</h3>
-            <p>Baterías</p>
-            <p>Stock: 2</p>
-            <p>$599.990</p>
-          </div>
-        </Col>
+              <p>{producto.categoriaNombre}</p>
 
-        <Col xs={12} md={6} lg={4}>
-          <div className="border rounded p-3 h-100">
-            <h3 className="h5">Micrófono Condensador Audio-Tech AT2020</h3>
-            <p>Micrófonos</p>
-            <p>Stock: 4</p>
-            <p>$199.990</p>
-          </div>
-        </Col>
+              <p>Stock: {producto.stock}</p>
+
+              <p>${producto.precio}</p>
+            </div>
+          </Col>
+        ))}
       </Row>
     </Container>
   );
