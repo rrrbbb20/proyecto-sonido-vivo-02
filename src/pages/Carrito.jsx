@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import ItemCarrito from "../components/ItemCarrito";
 
 function Carrito() {
   // Estado que almacena los productos agregados al carrito
@@ -94,40 +95,13 @@ function Carrito() {
             ) : (
               // Se recorre el carrito para mostrar cada producto
               carrito.map((producto) => (
-                <div key={producto.id} className="border-bottom py-3">
-                  <h3 className="h6">{producto.nombre}</h3>
-
-                  <p>Precio: ${producto.precio}</p>
-
-                  <div className="d-flex align-items-center gap-2 mb-3">
-                    <Button
-                      variant="outline-secondary"
-                      onClick={() => disminuirCantidad(producto.id)}
-                    >
-                      -
-                    </Button>
-
-                    <span>Cantidad: {producto.cantidad}</span>
-
-                    <Button
-                      variant="outline-secondary"
-                      onClick={() => aumentarCantidad(producto.id)}
-                    >
-                      +
-                    </Button>
-                  </div>
-
-                  <p>
-                    Subtotal producto: ${producto.precio * producto.cantidad}
-                  </p>
-
-                  <Button
-                    variant="danger"
-                    onClick={() => eliminarProducto(producto.id)}
-                  >
-                    Eliminar producto
-                  </Button>
-                </div>
+                <ItemCarrito
+                    key={producto.id}
+                    producto={producto}
+                    aumentarCantidad={aumentarCantidad}
+                    disminuirCantidad={disminuirCantidad}
+                    eliminarProducto={eliminarProducto}
+                />
               ))
             )}
           </div>
