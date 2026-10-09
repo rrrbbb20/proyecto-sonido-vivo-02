@@ -56,6 +56,17 @@ function Carrito() {
     setCarrito(carritoActualizado);
   }
 
+  // Elimina del carrito el producto seleccionado
+  function eliminarProducto(id) {
+    const carritoActualizado = carrito.filter(
+        (producto) => producto.id !== id
+    );
+
+    setCarrito(carritoActualizado);
+  }
+
+  
+
   // Calcula el subtotal sumando precio por cantidad de cada producto
   const subtotal = carrito.reduce(
     (total, producto) => total + producto.precio * producto.cantidad,
@@ -105,6 +116,13 @@ function Carrito() {
                   <p>
                     Subtotal producto: ${producto.precio * producto.cantidad}
                   </p>
+
+                  <Button
+                    variant="danger"
+                    onClick={() => eliminarProducto(producto.id)}
+                  >
+                    Eliminar producto
+                  </Button>
                 </div>
               ))
             )}
