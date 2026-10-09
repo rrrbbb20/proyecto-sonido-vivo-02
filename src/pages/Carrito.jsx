@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 
 function Carrito() {
+  // Estado que almacena los productos agregados al carrito
   const [carrito, setCarrito] = useState([
     {
       id: 1,
@@ -23,6 +24,12 @@ function Carrito() {
     },
   ]);
 
+  // Calcula el subtotal sumando precio por cantidad de cada producto
+  const subtotal = carrito.reduce(
+    (total, producto) => total + producto.precio * producto.cantidad,
+    0
+  );
+
   return (
     <Container className="py-4">
       <h1 className="mb-4">Carrito de compras</h1>
@@ -32,16 +39,21 @@ function Carrito() {
           <div className="border rounded p-3">
             <h2 className="h5">Productos agregados</h2>
 
+            {/* Si el carrito está vacío se muestra un mensaje */}
             {carrito.length === 0 ? (
               <p className="mb-0">
                 Aún no hay productos agregados al carrito.
               </p>
             ) : (
+              // Se recorre el carrito para mostrar cada producto
               carrito.map((producto) => (
                 <div key={producto.id} className="border-bottom py-3">
                   <h3 className="h6">{producto.nombre}</h3>
                   <p>Precio: ${producto.precio}</p>
                   <p>Cantidad: {producto.cantidad}</p>
+                  <p>
+                    Subtotal producto: ${producto.precio * producto.cantidad}
+                  </p>
                 </div>
               ))
             )}
@@ -54,7 +66,13 @@ function Carrito() {
 
             <p>Productos en el carrito: {carrito.length}</p>
 
+            <p>Subtotal: ${subtotal}</p>
+
             <hr />
+
+            <p className="fw-bold">
+              Total: ${subtotal}
+            </p>
 
             <Button variant="primary" className="w-100">
               Continuar compra
