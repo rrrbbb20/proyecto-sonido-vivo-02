@@ -24,6 +24,38 @@ function Carrito() {
     },
   ]);
 
+  // Aumenta en una unidad la cantidad del producto seleccionado
+  function aumentarCantidad(id) {
+    const carritoActualizado = carrito.map((producto) => {
+      if (producto.id === id) {
+        return {
+          ...producto,
+          cantidad: producto.cantidad + 1,
+        };
+      }
+
+      return producto;
+    });
+
+    setCarrito(carritoActualizado);
+  }
+
+  // Disminuye la cantidad del producto sin permitir valores menores a 1
+  function disminuirCantidad(id) {
+    const carritoActualizado = carrito.map((producto) => {
+      if (producto.id === id && producto.cantidad > 1) {
+        return {
+          ...producto,
+          cantidad: producto.cantidad - 1,
+        };
+      }
+
+      return producto;
+    });
+
+    setCarrito(carritoActualizado);
+  }
+
   // Calcula el subtotal sumando precio por cantidad de cada producto
   const subtotal = carrito.reduce(
     (total, producto) => total + producto.precio * producto.cantidad,
@@ -49,8 +81,27 @@ function Carrito() {
               carrito.map((producto) => (
                 <div key={producto.id} className="border-bottom py-3">
                   <h3 className="h6">{producto.nombre}</h3>
+
                   <p>Precio: ${producto.precio}</p>
-                  <p>Cantidad: {producto.cantidad}</p>
+
+                  <div className="d-flex align-items-center gap-2 mb-3">
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => disminuirCantidad(producto.id)}
+                    >
+                      -
+                    </Button>
+
+                    <span>Cantidad: {producto.cantidad}</span>
+
+                    <Button
+                      variant="outline-secondary"
+                      onClick={() => aumentarCantidad(producto.id)}
+                    >
+                      +
+                    </Button>
+                  </div>
+
                   <p>
                     Subtotal producto: ${producto.precio * producto.cantidad}
                   </p>
