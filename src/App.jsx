@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom"; 
 import Cabecera from "./components/Cabecera";
 import Navegacion from "./components/Navegacion";
+import Inicio from "./pages/Inicio";
 import Registro from "./pages/Registro";
 import Catalogo from "./pages/Catalogo";
 import Carrito from "./pages/Carrito";
@@ -19,7 +20,7 @@ function App() {
         {/* <Routes> actúa como un "televisor" que cambia de canal */}
         <Routes>
           {/* Cada <Route> es un canal diferente. El "path" es la URL y el "element" es lo que muestra */}
-
+          <Route path="/" element={<Inicio />} />
           <Route path="/registro" element={<Registro />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/carrito" element={<Carrito />} />
