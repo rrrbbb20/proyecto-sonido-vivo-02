@@ -1,10 +1,36 @@
+import { useState } from "react";
 import { Container } from "react-bootstrap";
 import FormularioTrabajador from "./FormularioTrabajador";
 
 function Admin() {
-  // Recibe los datos enviados desde FormularioTrabajador
+  // Recupera los trabajadores guardados al cargar la página
+  const [trabajadores, setTrabajadores] = useState(() => {
+    const trabajadoresGuardados =
+      localStorage.getItem("trabajadoresSonidoVivo");
+
+    return trabajadoresGuardados
+      ? JSON.parse(trabajadoresGuardados)
+      : [];
+  });
+
+  // Guarda un nuevo trabajador
   function guardarTrabajador(trabajador) {
-    console.log("Trabajador recibido:", trabajador);
+    const nuevoTrabajador = {
+      ...trabajador,
+      id: Date.now(),
+    };
+
+    const trabajadoresActualizados = [
+      ...trabajadores,
+      nuevoTrabajador,
+    ];
+
+    setTrabajadores(trabajadoresActualizados);
+
+    localStorage.setItem(
+      "trabajadoresSonidoVivo",
+      JSON.stringify(trabajadoresActualizados)
+    );
   }
 
   return (
