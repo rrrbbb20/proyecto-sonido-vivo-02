@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Container, Form, Row, Col } from "react-bootstrap";
+import { Container, Form, Row, Col, Button } from "react-bootstrap";
 
 // Productos disponibles en el catálogo
 const productos = [
@@ -49,6 +49,47 @@ function Catalogo() {
     return coincideBusqueda && coincideCategoria;
   });
 
+  // Agrega un producto al carrito almacenado en localStorage
+  function agregarAlCarrito(producto) {
+    const carritoGuardado = localStorage.getItem("carritoSonidoVivo");
+
+    const carrito = carritoGuardado
+      ? JSON.parse(carritoGuardado)
+      : [];
+
+    const productoExistente = carrito.find(
+      (item) => item.id === producto.id
+    );
+
+    let carritoActualizado;
+
+    if (productoExistente) {
+      carritoActualizado = carrito.map((item) => {
+        if (item.id === producto.id) {
+          return {
+            ...item,
+            cantidad: item.cantidad + 1,
+          };
+        }
+
+        return item;
+      });
+    } else {
+      carritoActualizado = [
+        ...carrito,
+        {
+          ...producto,
+          cantidad: 1,
+        },
+      ];
+    }
+
+    localStorage.setItem(
+      "carritoSonidoVivo",
+      JSON.stringify(carritoActualizado)
+    );
+  }
+
   return (
     <Container className="py-4">
       <h1 className="mb-4">Catálogo</h1>
@@ -96,6 +137,13 @@ function Catalogo() {
               <p>Stock: {producto.stock}</p>
 
               <p>${producto.precio}</p>
+
+              <Button
+                variant="primary"
+                onClick={() => agregarAlCarrito(producto)}
+              >
+                Agregar al carrito
+              </Button>
             </div>
           </Col>
         ))}
