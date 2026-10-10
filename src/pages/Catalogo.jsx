@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
 import { productos } from "../data/productos";
 
-function Catalogo({ onCarritoActualizado }) {
+function Catalogo({ carrito, setCarrito }) {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("");
   const [mensaje, setMensaje] = useState("");
@@ -21,10 +21,8 @@ function Catalogo({ onCarritoActualizado }) {
     setCategoria("");
   }
 
-  // Agrega un producto al carrito respetando el stock disponible
+  // Agrega un producto respetando el stock disponible
   function agregarAlCarrito(producto) {
-    const carritoGuardado = localStorage.getItem("carritoSonidoVivo");
-    const carrito = carritoGuardado ? JSON.parse(carritoGuardado) : [];
     const productoExistente = carrito.find((item) => item.id === producto.id);
 
     if (productoExistente && productoExistente.cantidad >= producto.stock) {
@@ -46,8 +44,8 @@ function Catalogo({ onCarritoActualizado }) {
       carritoActualizado = [...carrito, { ...producto, cantidad: 1 }];
     }
 
-    localStorage.setItem("carritoSonidoVivo", JSON.stringify(carritoActualizado));
-    onCarritoActualizado(carritoActualizado);
+    // Actualiza el estado compartido del carrito
+    setCarrito(carritoActualizado);
     setMensaje(`${producto.nombre} fue agregado al carrito.`);
   }
 
@@ -104,9 +102,7 @@ function Catalogo({ onCarritoActualizado }) {
       {/* Informa cuando ningún producto coincide con los filtros */}
       {productosFiltrados.length === 0 ? (
         <div className="border rounded p-4 text-center">
-          <p className="mb-3">
-            No se encontraron productos con los filtros seleccionados.
-          </p>
+          <p className="mb-3">No se encontraron productos con los filtros seleccionados.</p>
 
           <Button variant="outline-primary" onClick={limpiarFiltros}>
             Mostrar todos
@@ -116,27 +112,13 @@ function Catalogo({ onCarritoActualizado }) {
         <Row className="g-4">
           {productosFiltrados.map((producto) => (
             <Col key={producto.id} xs={12} md={6} lg={4}>
-              {/* Mantiene todos los productos con la misma estructura visual */}
               <div className="border rounded p-3 h-100 d-flex flex-column">
                 <h3 className="h5">{producto.nombre}</h3>
+                <p className="mb-2">Categoría: {producto.categoriaNombre}</p>
+                <p className="mb-2">Stock disponible: {producto.stock}</p>
+                <p className="fw-bold mb-4">Precio: ${producto.precio}</p>
 
-                <p className="mb-2">
-                  Categoría: {producto.categoriaNombre}
-                </p>
-
-                <p className="mb-2">
-                  Stock disponible: {producto.stock}
-                </p>
-
-                <p className="fw-bold mb-4">
-                  Precio: ${producto.precio}
-                </p>
-
-                <Button
-                  variant="primary"
-                  className="w-100 mt-auto"
-                  onClick={() => agregarAlCarrito(producto)}
-                >
+                <Button variant="primary" className="w-100 mt-auto" onClick={() => agregarAlCarrito(producto)}>
                   Agregar al carrito
                 </Button>
               </div>
