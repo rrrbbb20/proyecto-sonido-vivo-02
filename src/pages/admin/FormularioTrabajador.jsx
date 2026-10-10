@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Button } from "react-bootstrap";
 
 const datosIniciales = {
@@ -10,12 +10,35 @@ const datosIniciales = {
   contrasena: "",
 };
 
-function FormularioTrabajador({ onGuardar }) {
+function FormularioTrabajador({
+  onGuardar,
+  onActualizar,
+  trabajadorEditando,
+  onCancelarEdicion,
+}) {
   // Estado que almacena los datos del formulario
   const [datos, setDatos] = useState(datosIniciales);
 
   // Estado que almacena los errores encontrados
   const [errores, setErrores] = useState({});
+
+  // Carga los datos cuando se selecciona un trabajador para editar
+  useEffect(() => {
+    if (trabajadorEditando) {
+      setDatos({
+        nombre: trabajadorEditando.nombre,
+        apellido: trabajadorEditando.apellido,
+        correo: trabajadorEditando.correo,
+        direccion: trabajadorEditando.direccion,
+        rol: trabajadorEditando.rol,
+        contrasena: "",
+      });
+    } else {
+      setDatos(datosIniciales);
+    }
+
+    setErrores({});
+  }, [trabajadorEditando]);
 
   // Actualiza el campo correspondiente mientras el usuario escribe
   function cambiarCampo(evento) {
@@ -50,7 +73,7 @@ function FormularioTrabajador({ onGuardar }) {
         "El apellido debe tener al menos 3 caracteres.";
     }
 
-    // Validación del correo electrónico
+    // Validación del correo
     if (correo === "") {
       nuevosErrores.correo =
         "Ingresa un correo electrónico.";
@@ -71,10 +94,13 @@ function FormularioTrabajador({ onGuardar }) {
         "Selecciona un rol.";
     }
 
-    // Validación de la contraseña
+    // La contraseña solo se solicita al registrar un trabajador nuevo
     if (
-      datos.contrasena.length < 8 ||
-      datos.contrasena.length > 12
+      !trabajadorEditando &&
+      (
+        datos.contrasena.length < 8 ||
+        datos.contrasena.length > 12
+      )
     ) {
       nuevosErrores.contrasena =
         "La contraseña debe tener entre 8 y 12 caracteres.";
@@ -82,27 +108,51 @@ function FormularioTrabajador({ onGuardar }) {
 
     setErrores(nuevosErrores);
 
-    // Si existen errores, no se envían los datos
+    // Detiene el envío si existe algún error
     if (Object.keys(nuevosErrores).length > 0) {
       return;
     }
 
-    // Entrega los datos al componente padre
-    const guardado = onGuardar({
-    ...datos,
-    correo: correo,
-    });
+    // Si existe un trabajador seleccionado, actualiza sus datos
+    if (trabajadorEditando) {
+      const actualizado = onActualizar({
+        id: trabajadorEditando.id,
+        nombre: datos.nombre.trim(),
+        apellido: datos.apellido.trim(),
+        correo: correo,
+        direccion: datos.direccion.trim(),
+        rol: datos.rol,
+      });
 
-    // Informa si el correo ya se encuentra registrado
-    if (!guardado) {
-    setErrores({
-        correo: "Ya existe un trabajador con este correo.",
-    });
+      // Informa si el nuevo correo pertenece a otro trabajador
+      if (!actualizado) {
+        setErrores({
+          correo: "Ya existe un trabajador con este correo.",
+        });
 
-    return;
+        return;
+      }
+    } else {
+      // Si no existe trabajador seleccionado, registra uno nuevo
+      const guardado = onGuardar({
+        ...datos,
+        nombre: datos.nombre.trim(),
+        apellido: datos.apellido.trim(),
+        correo: correo,
+        direccion: datos.direccion.trim(),
+      });
+
+      // Informa si el correo ya se encuentra registrado
+      if (!guardado) {
+        setErrores({
+          correo: "Ya existe un trabajador con este correo.",
+        });
+
+        return;
+      }
     }
 
-    // Limpia el formulario después de guardar correctamente
+    // Limpia el formulario después de completar la operación
     setDatos(datosIniciales);
     setErrores({});
   }
@@ -112,6 +162,12 @@ function FormularioTrabajador({ onGuardar }) {
       onSubmit={enviarFormulario}
       noValidate
     >
+      <h2 className="h4 mb-3">
+        {trabajadorEditando
+          ? "Editar trabajador"
+          : "Registrar trabajador"}
+      </h2>
+
       <Form.Group className="mb-3">
         <Form.Label>
           Nombre
@@ -214,30 +270,48 @@ function FormularioTrabajador({ onGuardar }) {
         </Form.Control.Feedback>
       </Form.Group>
 
-      <Form.Group className="mb-3">
-        <Form.Label>
-          Contraseña
-        </Form.Label>
+      {/* La contraseña se solicita solamente al registrar */}
+      {!trabajadorEditando && (
+        <Form.Group className="mb-3">
+          <Form.Label>
+            Contraseña
+          </Form.Label>
 
-        <Form.Control
-          type="password"
-          name="contrasena"
-          value={datos.contrasena}
-          onChange={cambiarCampo}
-          isInvalid={Boolean(errores.contrasena)}
-        />
+          <Form.Control
+            type="password"
+            name="contrasena"
+            value={datos.contrasena}
+            onChange={cambiarCampo}
+            isInvalid={Boolean(errores.contrasena)}
+          />
 
-        <Form.Control.Feedback type="invalid">
-          {errores.contrasena}
-        </Form.Control.Feedback>
-      </Form.Group>
+          <Form.Control.Feedback type="invalid">
+            {errores.contrasena}
+          </Form.Control.Feedback>
+        </Form.Group>
+      )}
 
-      <Button
-        type="submit"
-        variant="primary"
-      >
-        Registrar trabajador
-      </Button>
+      <div className="d-flex gap-2 flex-wrap">
+        <Button
+          type="submit"
+          variant="primary"
+        >
+          {trabajadorEditando
+            ? "Guardar cambios"
+            : "Registrar trabajador"}
+        </Button>
+
+        {/* El botón cancelar aparece solamente durante la edición */}
+        {trabajadorEditando && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onCancelarEdicion}
+          >
+            Cancelar edición
+          </Button>
+        )}
+      </div>
     </Form>
   );
 }
