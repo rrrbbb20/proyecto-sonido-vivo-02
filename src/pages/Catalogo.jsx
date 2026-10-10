@@ -37,6 +37,9 @@ function Catalogo() {
   // Estado para guardar la categoría seleccionada
   const [categoria, setCategoria] = useState("");
 
+  // Estado para mostrar un mensaje al agregar un producto
+  const [mensaje, setMensaje] = useState("");
+
   // Filtra los productos según el texto y la categoría seleccionada
   const productosFiltrados = productos.filter((producto) => {
     const coincideBusqueda = producto.nombre
@@ -88,6 +91,9 @@ function Catalogo() {
       "carritoSonidoVivo",
       JSON.stringify(carritoActualizado)
     );
+
+    // Informa al usuario que el producto fue agregado al carrito
+    setMensaje(`${producto.nombre} fue agregado al carrito.`);
   }
 
   return (
@@ -97,6 +103,13 @@ function Catalogo() {
       <p className="mb-4">
         Explora nuestros instrumentos musicales y equipos de audio.
       </p>
+
+      {/* Muestra una confirmación después de agregar un producto */}
+      {mensaje !== "" && (
+        <p className="text-success fw-bold">
+          {mensaje}
+        </p>
+      )}
 
       <Form className="mb-4">
         <Row className="g-3">
