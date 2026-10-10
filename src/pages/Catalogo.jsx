@@ -1,70 +1,45 @@
 import { useState } from "react";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
-
-// Productos disponibles en el catálogo
-const productos = [
-  {
-    id: 1,
-    nombre: "Guitarra Eléctrica Epiphone SG Standard",
-    categoria: "guitarras",
-    categoriaNombre: "Guitarras eléctricas",
-    precio: 319990,
-    stock: 3,
-  },
-  {
-    id: 2,
-    nombre: "Batería Acústica Pearl Roadshow",
-    categoria: "baterias",
-    categoriaNombre: "Baterías",
-    precio: 599990,
-    stock: 2,
-  },
-  {
-    id: 3,
-    nombre: "Micrófono Condensador Audio-Tech AT2020",
-    categoria: "microfonos",
-    categoriaNombre: "Micrófonos",
-    precio: 199990,
-    stock: 4,
-  },
-];
+import { productos } from "../data/productos";
 
 function Catalogo() {
-
   // Estado para guardar el texto escrito en el buscador
   const [busqueda, setBusqueda] = useState("");
 
   // Estado para guardar la categoría seleccionada
   const [categoria, setCategoria] = useState("");
 
-  // Estado para mostrar un mensaje al agregar un producto
+  // Estado para mostrar mensajes al agregar productos
   const [mensaje, setMensaje] = useState("");
 
-  // Filtra los productos según el texto y la categoría seleccionada
+  // Filtra los productos según búsqueda y categoría
   const productosFiltrados = productos.filter((producto) => {
     const coincideBusqueda = producto.nombre
       .toLowerCase()
       .includes(busqueda.toLowerCase());
 
     const coincideCategoria =
-      categoria === "" || producto.categoria === categoria;
+      categoria === "" ||
+      producto.categoria === categoria;
 
     return coincideBusqueda && coincideCategoria;
   });
 
-  // Agrega un producto al carrito almacenado en localStorage
+  // Agrega un producto al carrito guardado en localStorage
   function agregarAlCarrito(producto) {
-    const carritoGuardado = localStorage.getItem("carritoSonidoVivo");
+    const carritoGuardado =
+      localStorage.getItem("carritoSonidoVivo");
 
     const carrito = carritoGuardado
       ? JSON.parse(carritoGuardado)
       : [];
 
+    // Busca si el producto ya se encuentra en el carrito
     const productoExistente = carrito.find(
       (item) => item.id === producto.id
     );
 
-    // Evita agregar más unidades que el stock disponible
+    // Evita superar el stock disponible
     if (
       productoExistente &&
       productoExistente.cantidad >= producto.stock
@@ -78,6 +53,7 @@ function Catalogo() {
 
     let carritoActualizado;
 
+    // Si ya existe, aumenta solamente su cantidad
     if (productoExistente) {
       carritoActualizado = carrito.map((item) => {
         if (item.id === producto.id) {
@@ -90,6 +66,7 @@ function Catalogo() {
         return item;
       });
     } else {
+      // Si no existe, agrega el producto con cantidad inicial uno
       carritoActualizado = [
         ...carrito,
         {
@@ -99,26 +76,31 @@ function Catalogo() {
       ];
     }
 
+    // Guarda el carrito actualizado
     localStorage.setItem(
       "carritoSonidoVivo",
       JSON.stringify(carritoActualizado)
     );
 
-    // Informa al usuario que el producto fue agregado al carrito
-    setMensaje(`${producto.nombre} fue agregado al carrito.`);
+    // Informa el resultado al usuario
+    setMensaje(
+      `${producto.nombre} fue agregado al carrito.`
+    );
   }
 
   return (
     <Container className="py-4">
-      <h1 className="mb-4">Catálogo</h1>
+      <h1 className="mb-4">
+        Catálogo
+      </h1>
 
       <p className="mb-4">
         Explora nuestros instrumentos musicales y equipos de audio.
       </p>
 
-      {/* Muestra una confirmación después de agregar un producto */}
+      {/* Muestra el último mensaje generado */}
       {mensaje !== "" && (
-        <p className="text-success fw-bold">
+        <p className="fw-bold">
           {mensaje}
         </p>
       )}
@@ -130,42 +112,74 @@ function Catalogo() {
               type="text"
               placeholder="Buscar productos..."
               value={busqueda}
-              onChange={(evento) => setBusqueda(evento.target.value)}
+              onChange={(evento) =>
+                setBusqueda(evento.target.value)
+              }
             />
           </Col>
 
           <Col xs={12} md={4}>
             <Form.Select
               value={categoria}
-              onChange={(evento) => setCategoria(evento.target.value)}
+              onChange={(evento) =>
+                setCategoria(evento.target.value)
+              }
             >
-              <option value="">Todas las categorías</option>
-              <option value="guitarras">Guitarras</option>
-              <option value="baterias">Baterías</option>
-              <option value="microfonos">Micrófonos</option>
+              <option value="">
+                Todas las categorías
+              </option>
+
+              <option value="guitarras">
+                Guitarras
+              </option>
+
+              <option value="baterias">
+                Baterías
+              </option>
+
+              <option value="microfonos">
+                Micrófonos
+              </option>
             </Form.Select>
           </Col>
         </Row>
       </Form>
 
-      <h2 className="mb-3">Productos</h2>
+      <h2 className="mb-3">
+        Productos
+      </h2>
 
       <Row className="g-4">
-        {/* Se recorre el arreglo para mostrar todos los productos */}
+        {/* Genera una tarjeta por cada producto filtrado */}
         {productosFiltrados.map((producto) => (
-          <Col key={producto.id} xs={12} md={6} lg={4}>
+          <Col
+            key={producto.id}
+            xs={12}
+            md={6}
+            lg={4}
+          >
             <div className="border rounded p-3 h-100">
-              <h3 className="h5">{producto.nombre}</h3>
+              <h3 className="h5">
+                {producto.nombre}
+              </h3>
 
-              <p>{producto.categoriaNombre}</p>
+              <p>
+                {producto.categoriaNombre}
+              </p>
 
-              <p>Stock: {producto.stock}</p>
+              <p>
+                Stock: {producto.stock}
+              </p>
 
-              <p>${producto.precio}</p>
+              <p>
+                ${producto.precio}
+              </p>
 
               <Button
                 variant="primary"
-                onClick={() => agregarAlCarrito(producto)}
+                onClick={() =>
+                  agregarAlCarrito(producto)
+                }
               >
                 Agregar al carrito
               </Button>
