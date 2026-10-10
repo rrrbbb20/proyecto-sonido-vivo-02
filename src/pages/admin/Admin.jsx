@@ -19,20 +19,24 @@ function Admin() {
   }, [trabajadores]);
 
   function guardarTrabajador(trabajador) {
-    const correoExiste = trabajadores.some((item) => item.correo === trabajador.correo);
+    const correoExiste = trabajadores.some(
+      (item) => item.correo === trabajador.correo
+    );
 
     if (correoExiste) {
       return false;
     }
 
-    // Genera un id mayor al último trabajador registrado
+    // Genera un identificador mayor a los trabajadores existentes
     let nuevoId = 1;
 
-    if (trabajadores.length > 0) {
-      nuevoId = trabajadores[trabajadores.length - 1].id + 1;
+    for (const trabajadorGuardado of trabajadores) {
+      if (trabajadorGuardado.id >= nuevoId) {
+        nuevoId = trabajadorGuardado.id + 1;
+      }
     }
 
-    // La contraseña no se guarda en localStorage
+    // La contraseña se valida, pero no se almacena
     const nuevoTrabajador = {
       id: nuevoId,
       nombre: trabajador.nombre,
