@@ -53,17 +53,25 @@ function Catalogo({ onCarritoActualizado }) {
 
   return (
     <Container className="py-4">
-      <h1 className="mb-4">Catálogo</h1>
+      <h1 className="mb-3">Catálogo</h1>
 
       <p className="mb-4">
         Explora nuestros instrumentos musicales y equipos de audio.
       </p>
 
-      {mensaje !== "" && <p className="fw-bold">{mensaje}</p>}
+      {/* Muestra el resultado de la última acción realizada */}
+      {mensaje !== "" && (
+        <div className="border rounded p-3 mb-4">
+          <p className="fw-bold mb-0">{mensaje}</p>
+        </div>
+      )}
 
-      <Form className="mb-4">
+      {/* Controles de búsqueda y filtrado */}
+      <Form className="border rounded p-3 mb-4">
         <Row className="g-3">
           <Col xs={12} md={6}>
+            <Form.Label>Buscar producto</Form.Label>
+
             <Form.Control
               type="text"
               placeholder="Buscar productos..."
@@ -73,6 +81,8 @@ function Catalogo({ onCarritoActualizado }) {
           </Col>
 
           <Col xs={12} md={4}>
+            <Form.Label>Categoría</Form.Label>
+
             <Form.Select value={categoria} onChange={(evento) => setCategoria(evento.target.value)}>
               <option value="">Todas las categorías</option>
               <option value="guitarras">Guitarras</option>
@@ -81,7 +91,7 @@ function Catalogo({ onCarritoActualizado }) {
             </Form.Select>
           </Col>
 
-          <Col xs={12} md={2}>
+          <Col xs={12} md={2} className="d-flex align-items-end">
             <Button variant="outline-secondary" className="w-100" onClick={limpiarFiltros}>
               Limpiar
             </Button>
@@ -94,7 +104,9 @@ function Catalogo({ onCarritoActualizado }) {
       {/* Informa cuando ningún producto coincide con los filtros */}
       {productosFiltrados.length === 0 ? (
         <div className="border rounded p-4 text-center">
-          <p className="mb-3">No se encontraron productos con los filtros seleccionados.</p>
+          <p className="mb-3">
+            No se encontraron productos con los filtros seleccionados.
+          </p>
 
           <Button variant="outline-primary" onClick={limpiarFiltros}>
             Mostrar todos
@@ -104,13 +116,27 @@ function Catalogo({ onCarritoActualizado }) {
         <Row className="g-4">
           {productosFiltrados.map((producto) => (
             <Col key={producto.id} xs={12} md={6} lg={4}>
-              <div className="border rounded p-3 h-100">
+              {/* Mantiene todos los productos con la misma estructura visual */}
+              <div className="border rounded p-3 h-100 d-flex flex-column">
                 <h3 className="h5">{producto.nombre}</h3>
-                <p>{producto.categoriaNombre}</p>
-                <p>Stock: {producto.stock}</p>
-                <p>${producto.precio}</p>
 
-                <Button variant="primary" onClick={() => agregarAlCarrito(producto)}>
+                <p className="mb-2">
+                  Categoría: {producto.categoriaNombre}
+                </p>
+
+                <p className="mb-2">
+                  Stock disponible: {producto.stock}
+                </p>
+
+                <p className="fw-bold mb-4">
+                  Precio: ${producto.precio}
+                </p>
+
+                <Button
+                  variant="primary"
+                  className="w-100 mt-auto"
+                  onClick={() => agregarAlCarrito(producto)}
+                >
                   Agregar al carrito
                 </Button>
               </div>

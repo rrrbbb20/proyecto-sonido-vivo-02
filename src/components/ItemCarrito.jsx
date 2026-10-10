@@ -1,4 +1,4 @@
-import { Button } from "react-bootstrap";
+import { Button, Row, Col } from "react-bootstrap";
 
 function ItemCarrito({
   producto,
@@ -8,68 +8,58 @@ function ItemCarrito({
 }) {
   return (
     <div className="border-bottom py-3">
-      {/* Información principal del producto */}
-      <h3 className="h6">
-        {producto.nombre}
-      </h3>
+      {/* Distribuye la información del producto de forma responsiva */}
+      <Row className="g-3 align-items-center">
+        <Col xs={12} md={5}>
+          <h3 className="h6 mb-2">{producto.nombre}</h3>
+          <p className="mb-1">Precio: ${producto.precio}</p>
+          <p className="mb-0">Stock disponible: {producto.stock}</p>
+        </Col>
 
-      <p>
-        Precio: ${producto.precio}
-      </p>
+        <Col xs={12} md={4}>
+          {/* Controles para modificar la cantidad */}
+          <div className="d-flex align-items-center gap-2">
+            <Button
+              variant="outline-secondary"
+              onClick={() => disminuirCantidad(producto.id)}
+              disabled={producto.cantidad === 1}
+            >
+              -
+            </Button>
 
-      <p>
-        Stock disponible: {producto.stock}
-      </p>
+            <span>Cantidad: {producto.cantidad}</span>
 
-      {/* Controles para modificar la cantidad */}
-      <div className="d-flex align-items-center gap-2 mb-3">
-        <Button
-          variant="outline-secondary"
-          onClick={() =>
-            disminuirCantidad(producto.id)
-          }
-          disabled={producto.cantidad === 1}
-        >
-          -
-        </Button>
+            <Button
+              variant="outline-secondary"
+              onClick={() => aumentarCantidad(producto.id)}
+              disabled={producto.cantidad >= producto.stock}
+            >
+              +
+            </Button>
+          </div>
 
-        <span>
-          Cantidad: {producto.cantidad}
-        </span>
+          {/* Informa cuando se alcanza el máximo disponible */}
+          {producto.cantidad >= producto.stock && (
+            <p className="text-danger mt-2 mb-0">
+              No hay más stock disponible.
+            </p>
+          )}
+        </Col>
 
-        <Button
-          variant="outline-secondary"
-          onClick={() =>
-            aumentarCantidad(producto.id)
-          }
-          disabled={
-            producto.cantidad >= producto.stock
-          }
-        >
-          +
-        </Button>
-      </div>
+        <Col xs={12} md={3}>
+          <p className="fw-bold mb-2">
+            Subtotal: ${producto.precio * producto.cantidad}
+          </p>
 
-      {/* Informa cuando se alcanzó el máximo disponible */}
-      {producto.cantidad >= producto.stock && (
-        <p className="text-danger">
-          No hay más stock disponible.
-        </p>
-      )}
-
-      <p>
-        Subtotal producto: $
-        {producto.precio * producto.cantidad}
-      </p>
-
-      <Button
-        variant="danger"
-        onClick={() =>
-          eliminarProducto(producto.id)
-        }
-      >
-        Eliminar producto
-      </Button>
+          <Button
+            variant="danger"
+            className="w-100"
+            onClick={() => eliminarProducto(producto.id)}
+          >
+            Eliminar
+          </Button>
+        </Col>
+      </Row>
     </div>
   );
 }
