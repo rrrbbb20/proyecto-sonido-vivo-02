@@ -15,13 +15,18 @@ function Catalogo({ onCarritoActualizado }) {
     return coincideBusqueda && coincideCategoria;
   });
 
-  // Agrega un producto al carrito
+  // Restablece la búsqueda y categoría seleccionada
+  function limpiarFiltros() {
+    setBusqueda("");
+    setCategoria("");
+  }
+
+  // Agrega un producto al carrito respetando el stock disponible
   function agregarAlCarrito(producto) {
     const carritoGuardado = localStorage.getItem("carritoSonidoVivo");
     const carrito = carritoGuardado ? JSON.parse(carritoGuardado) : [];
     const productoExistente = carrito.find((item) => item.id === producto.id);
 
-    // Evita superar el stock disponible
     if (productoExistente && productoExistente.cantidad >= producto.stock) {
       setMensaje(`No hay más stock disponible de ${producto.nombre}.`);
       return;
@@ -42,10 +47,7 @@ function Catalogo({ onCarritoActualizado }) {
     }
 
     localStorage.setItem("carritoSonidoVivo", JSON.stringify(carritoActualizado));
-
-    // Actualiza también el contador del menú
     onCarritoActualizado(carritoActualizado);
-
     setMensaje(`${producto.nombre} fue agregado al carrito.`);
   }
 
@@ -61,7 +63,7 @@ function Catalogo({ onCarritoActualizado }) {
 
       <Form className="mb-4">
         <Row className="g-3">
-          <Col xs={12} md={8}>
+          <Col xs={12} md={6}>
             <Form.Control
               type="text"
               placeholder="Buscar productos..."
@@ -78,27 +80,44 @@ function Catalogo({ onCarritoActualizado }) {
               <option value="microfonos">Micrófonos</option>
             </Form.Select>
           </Col>
+
+          <Col xs={12} md={2}>
+            <Button variant="outline-secondary" className="w-100" onClick={limpiarFiltros}>
+              Limpiar
+            </Button>
+          </Col>
         </Row>
       </Form>
 
       <h2 className="mb-3">Productos</h2>
 
-      <Row className="g-4">
-        {productosFiltrados.map((producto) => (
-          <Col key={producto.id} xs={12} md={6} lg={4}>
-            <div className="border rounded p-3 h-100">
-              <h3 className="h5">{producto.nombre}</h3>
-              <p>{producto.categoriaNombre}</p>
-              <p>Stock: {producto.stock}</p>
-              <p>${producto.precio}</p>
+      {/* Informa cuando ningún producto coincide con los filtros */}
+      {productosFiltrados.length === 0 ? (
+        <div className="border rounded p-4 text-center">
+          <p className="mb-3">No se encontraron productos con los filtros seleccionados.</p>
 
-              <Button variant="primary" onClick={() => agregarAlCarrito(producto)}>
-                Agregar al carrito
-              </Button>
-            </div>
-          </Col>
-        ))}
-      </Row>
+          <Button variant="outline-primary" onClick={limpiarFiltros}>
+            Mostrar todos
+          </Button>
+        </div>
+      ) : (
+        <Row className="g-4">
+          {productosFiltrados.map((producto) => (
+            <Col key={producto.id} xs={12} md={6} lg={4}>
+              <div className="border rounded p-3 h-100">
+                <h3 className="h5">{producto.nombre}</h3>
+                <p>{producto.categoriaNombre}</p>
+                <p>Stock: {producto.stock}</p>
+                <p>${producto.precio}</p>
+
+                <Button variant="primary" onClick={() => agregarAlCarrito(producto)}>
+                  Agregar al carrito
+                </Button>
+              </div>
+            </Col>
+          ))}
+        </Row>
+      )}
     </Container>
   );
 }
