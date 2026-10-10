@@ -5,6 +5,7 @@ import Registro from "./pages/Registro";
 import Catalogo from "./pages/Catalogo";
 import Carrito from "./pages/Carrito";
 import Login from "./pages/Login";
+import Admin from "./pages/admin/Admin";
 
 function App() {
   return (
@@ -18,13 +19,13 @@ function App() {
         {/* <Routes> actúa como un "televisor" que cambia de canal */}
         <Routes>
           {/* Cada <Route> es un canal diferente. El "path" es la URL y el "element" es lo que muestra */}
-          
 
           <Route path="/registro" element={<Registro />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/carrito" element={<Carrito />} />
           <Route path="/login" element={<Login />} />
-          
+          <Route path="/admin" element={<Admin />} />
+
         </Routes>
 
       </main>
