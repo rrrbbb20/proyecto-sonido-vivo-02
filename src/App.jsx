@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Cabecera from "./components/Cabecera";
 import Navegacion from "./components/Navegacion";
@@ -10,30 +10,22 @@ import Login from "./pages/Login";
 import Admin from "./pages/admin/Admin";
 
 function App() {
-  // Obtiene la cantidad total almacenada en el carrito
-  function obtenerCantidadCarrito() {
+  // Recupera el carrito guardado al cargar la aplicación
+  const [carrito, setCarrito] = useState(() => {
     const carritoGuardado = localStorage.getItem("carritoSonidoVivo");
-    const carrito = carritoGuardado ? JSON.parse(carritoGuardado) : [];
-    let cantidad = 0;
+    return carritoGuardado ? JSON.parse(carritoGuardado) : [];
+  });
 
-    for (const producto of carrito) {
-      cantidad = cantidad + producto.cantidad;
-    }
+  // Mantiene el carrito sincronizado con localStorage
+  useEffect(() => {
+    localStorage.setItem("carritoSonidoVivo", JSON.stringify(carrito));
+  }, [carrito]);
 
-    return cantidad;
-  }
+  // Calcula la cantidad total de unidades del carrito
+  let cantidadCarrito = 0;
 
-  const [cantidadCarrito, setCantidadCarrito] = useState(obtenerCantidadCarrito);
-
-  // Actualiza el contador cuando cambia el carrito
-  function actualizarCantidadCarrito(carrito) {
-    let cantidad = 0;
-
-    for (const producto of carrito) {
-      cantidad = cantidad + producto.cantidad;
-    }
-
-    setCantidadCarrito(cantidad);
+  for (const producto of carrito) {
+    cantidadCarrito = cantidadCarrito + producto.cantidad;
   }
 
   return (
@@ -44,8 +36,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/registro" element={<Registro />} />
-          <Route path="/catalogo" element={<Catalogo onCarritoActualizado={actualizarCantidadCarrito} />} />
-          <Route path="/carrito" element={<Carrito onCarritoActualizado={actualizarCantidadCarrito} />} />
+          <Route path="/catalogo" element={<Catalogo carrito={carrito} setCarrito={setCarrito} />} />
+          <Route path="/carrito" element={<Carrito carrito={carrito} setCarrito={setCarrito} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
         </Routes>

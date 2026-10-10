@@ -1,20 +1,9 @@
-import { useEffect, useState } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import ItemCarrito from "../components/ItemCarrito";
 
-function Carrito({ onCarritoActualizado }) {
-  // Recupera el carrito guardado
-  const [carrito, setCarrito] = useState(() => {
-    const carritoGuardado = localStorage.getItem("carritoSonidoVivo");
-    return carritoGuardado ? JSON.parse(carritoGuardado) : [];
-  });
-
-  // Mantiene localStorage sincronizado
-  useEffect(() => {
-    localStorage.setItem("carritoSonidoVivo", JSON.stringify(carrito));
-  }, [carrito]);
-
+function Carrito({ carrito, setCarrito }) {
+  // Aumenta la cantidad respetando el stock
   function aumentarCantidad(id) {
     const carritoActualizado = carrito.map((producto) => {
       if (producto.id === id && producto.cantidad < producto.stock) {
@@ -25,9 +14,9 @@ function Carrito({ onCarritoActualizado }) {
     });
 
     setCarrito(carritoActualizado);
-    onCarritoActualizado(carritoActualizado);
   }
 
+  // Disminuye la cantidad sin bajar de uno
   function disminuirCantidad(id) {
     const carritoActualizado = carrito.map((producto) => {
       if (producto.id === id && producto.cantidad > 1) {
@@ -38,23 +27,20 @@ function Carrito({ onCarritoActualizado }) {
     });
 
     setCarrito(carritoActualizado);
-    onCarritoActualizado(carritoActualizado);
   }
 
+  // Elimina un producto del carrito
   function eliminarProducto(id) {
     const carritoActualizado = carrito.filter((producto) => producto.id !== id);
-
     setCarrito(carritoActualizado);
-    onCarritoActualizado(carritoActualizado);
   }
 
   // Vacía completamente el carrito
   function vaciarCarrito() {
     setCarrito([]);
-    onCarritoActualizado([]);
   }
 
-  // Calcula los totales del carrito
+  // Calcula los totales
   let subtotal = 0;
   let cantidadTotal = 0;
 

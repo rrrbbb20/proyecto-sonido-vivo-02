@@ -6,6 +6,10 @@ function ItemCarrito({
   disminuirCantidad,
   eliminarProducto,
 }) {
+  // Calcula cuántas unidades todavía se pueden agregar
+  const stockDisponible = producto.stock - producto.cantidad;
+  const stockAgotado = stockDisponible === 0;
+
   return (
     <div className="border-bottom py-3">
       {/* Distribuye la información del producto de forma responsiva */}
@@ -13,7 +17,7 @@ function ItemCarrito({
         <Col xs={12} md={5}>
           <h3 className="h6 mb-2">{producto.nombre}</h3>
           <p className="mb-1">Precio: ${producto.precio}</p>
-          <p className="mb-0">Stock disponible: {producto.stock}</p>
+          <p className="mb-0">Stock disponible: {stockDisponible}</p>
         </Col>
 
         <Col xs={12} md={4}>
@@ -32,14 +36,14 @@ function ItemCarrito({
             <Button
               variant="outline-secondary"
               onClick={() => aumentarCantidad(producto.id)}
-              disabled={producto.cantidad >= producto.stock}
+              disabled={stockAgotado}
             >
               +
             </Button>
           </div>
 
-          {/* Informa cuando se alcanza el máximo disponible */}
-          {producto.cantidad >= producto.stock && (
+          {/* Informa cuando ya no quedan unidades disponibles */}
+          {stockAgotado && (
             <p className="text-danger mt-2 mb-0">
               No hay más stock disponible.
             </p>
