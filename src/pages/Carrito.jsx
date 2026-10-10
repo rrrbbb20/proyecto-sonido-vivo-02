@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import ItemCarrito from "../components/ItemCarrito";
 
 function Carrito({ onCarritoActualizado }) {
@@ -45,6 +46,12 @@ function Carrito({ onCarritoActualizado }) {
 
     setCarrito(carritoActualizado);
     onCarritoActualizado(carritoActualizado);
+  }
+
+  // Vacía completamente el carrito
+  function vaciarCarrito() {
+    setCarrito([]);
+    onCarritoActualizado([]);
   }
 
   // Calcula los totales del carrito
@@ -93,9 +100,19 @@ function Carrito({ onCarritoActualizado }) {
 
             <p className="fw-bold">Total: ${subtotal}</p>
 
-            <Button variant="primary" className="w-100" disabled={carrito.length === 0}>
-              Continuar compra
-            </Button>
+            <div className="d-grid gap-2">
+              <Button variant="primary" disabled={carrito.length === 0}>
+                Continuar compra
+              </Button>
+
+              <Button variant="outline-danger" onClick={vaciarCarrito} disabled={carrito.length === 0}>
+                Vaciar carrito
+              </Button>
+
+              <Link to="/catalogo" className="btn btn-outline-secondary">
+                Volver al catálogo
+              </Link>
+            </div>
           </div>
         </Col>
       </Row>
