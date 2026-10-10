@@ -4,6 +4,7 @@ import Navegacion from "./components/Navegacion";
 import Registro from "./pages/Registro";
 import Catalogo from "./pages/Catalogo";
 import Carrito from "./pages/Carrito";
+import Login from "./pages/Login";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
           <Route path="/registro" element={<Registro />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/carrito" element={<Carrito />} />
+          <Route path="/login" element={<Login />} />
           
         </Routes>
 
