@@ -13,6 +13,23 @@ function Navegacion() {
       : null;
   });
 
+  // Calcula la cantidad total de productos del carrito
+  const [cantidadCarrito] = useState(() => {
+    const carritoGuardado =
+      localStorage.getItem("carritoSonidoVivo");
+
+    if (!carritoGuardado) {
+      return 0;
+    }
+
+    const carrito = JSON.parse(carritoGuardado);
+
+    return carrito.reduce(
+      (total, producto) => total + producto.cantidad,
+      0
+    );
+  });
+
   // Elimina la sesión activa
   function cerrarSesion() {
     sessionStorage.removeItem("usuarioActivoSonidoVivo");
@@ -66,6 +83,13 @@ function Navegacion() {
               to="/contacto"
             >
               Contacto
+            </NavLink>
+
+            <NavLink
+              className="nav-link text-dark"
+              to="/carrito"
+            >
+              Carrito ({cantidadCarrito})
             </NavLink>
 
             {/* Cambia la navegación dependiendo de la sesión */}
