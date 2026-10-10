@@ -3,7 +3,7 @@ import { Container } from "react-bootstrap";
 import FormularioTrabajador from "./FormularioTrabajador";
 
 function Admin() {
-  // Recupera los trabajadores guardados al cargar la página
+  // Recupera los trabajadores guardados
   const [trabajadores, setTrabajadores] = useState(() => {
     const trabajadoresGuardados =
       localStorage.getItem("trabajadoresSonidoVivo");
@@ -13,11 +13,15 @@ function Admin() {
       : [];
   });
 
-  // Guarda un nuevo trabajador
+  // Guarda un nuevo trabajador sin almacenar la contraseña
   function guardarTrabajador(trabajador) {
     const nuevoTrabajador = {
-      ...trabajador,
-      id: Date.now(),
+      id: trabajadores.length + 1,
+      nombre: trabajador.nombre,
+      apellido: trabajador.apellido,
+      correo: trabajador.correo,
+      direccion: trabajador.direccion,
+      rol: trabajador.rol,
     };
 
     const trabajadoresActualizados = [
