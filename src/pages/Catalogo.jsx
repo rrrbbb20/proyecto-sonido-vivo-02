@@ -64,6 +64,18 @@ function Catalogo() {
       (item) => item.id === producto.id
     );
 
+    // Evita agregar más unidades que el stock disponible
+    if (
+      productoExistente &&
+      productoExistente.cantidad >= producto.stock
+    ) {
+      setMensaje(
+        `No hay más stock disponible de ${producto.nombre}.`
+      );
+
+      return;
+    }
+
     let carritoActualizado;
 
     if (productoExistente) {
