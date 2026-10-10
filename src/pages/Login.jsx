@@ -8,6 +8,9 @@ function Login() {
     contrasena: "",
   });
 
+  // Estado que almacena los mensajes de error del formulario
+  const [errores, setErrores] = useState({});
+
   // Actualiza el campo correspondiente cuando el usuario escribe
   function cambiarCampo(evento) {
     const { name, value } = evento.target;
@@ -18,8 +21,31 @@ function Login() {
     });
   }
 
+  // Valida los datos antes de intentar iniciar sesión
   function enviarFormulario(evento) {
     evento.preventDefault();
+
+    const nuevosErrores = {};
+
+    // Valida que el correo haya sido ingresado
+    if (!datos.correo.trim()) {
+      nuevosErrores.correo = "Ingresa tu correo electrónico.";
+    }
+
+    // Valida que la contraseña haya sido ingresada
+    if (!datos.contrasena) {
+      nuevosErrores.contrasena = "Ingresa tu contraseña.";
+    } else if (datos.contrasena.length < 8) {
+      nuevosErrores.contrasena =
+        "La contraseña debe tener al menos 8 caracteres.";
+    }
+
+    setErrores(nuevosErrores);
+
+    // Detiene el proceso si existen errores
+    if (Object.keys(nuevosErrores).length > 0) {
+      return;
+    }
 
     console.log(datos);
   }
@@ -32,7 +58,7 @@ function Login() {
         Ingresa tus datos para acceder a tu cuenta.
       </p>
 
-      <Form onSubmit={enviarFormulario}>
+      <Form onSubmit={enviarFormulario} noValidate>
         <Form.Group className="mb-3">
           <Form.Label>Correo electrónico</Form.Label>
 
@@ -42,7 +68,12 @@ function Login() {
             value={datos.correo}
             onChange={cambiarCampo}
             placeholder="correo@ejemplo.cl"
+            isInvalid={Boolean(errores.correo)}
           />
+
+          <Form.Control.Feedback type="invalid">
+            {errores.correo}
+          </Form.Control.Feedback>
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -53,7 +84,12 @@ function Login() {
             name="contrasena"
             value={datos.contrasena}
             onChange={cambiarCampo}
+            isInvalid={Boolean(errores.contrasena)}
           />
+
+          <Form.Control.Feedback type="invalid">
+            {errores.contrasena}
+          </Form.Control.Feedback>
         </Form.Group>
 
         <Button type="submit" variant="primary">
