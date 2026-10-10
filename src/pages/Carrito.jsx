@@ -3,7 +3,7 @@ import { Container, Row, Col, Button } from "react-bootstrap";
 import ItemCarrito from "../components/ItemCarrito";
 
 function Carrito() {
-  // Estado que recupera el carrito guardado en localStorage
+  // Recupera el carrito guardado al cargar el componente
   const [carrito, setCarrito] = useState(() => {
     const carritoGuardado =
       localStorage.getItem("carritoSonidoVivo");
@@ -13,7 +13,7 @@ function Carrito() {
       : [];
   });
 
-  // Guarda el carrito cada vez que cambia
+  // Mantiene localStorage sincronizado con el estado del carrito
   useEffect(() => {
     localStorage.setItem(
       "carritoSonidoVivo",
@@ -21,10 +21,13 @@ function Carrito() {
     );
   }, [carrito]);
 
-  // Aumenta la cantidad
+  // Aumenta la cantidad solamente si todavía existe stock disponible
   function aumentarCantidad(id) {
     const carritoActualizado = carrito.map((producto) => {
-      if (producto.id === id) {
+      if (
+        producto.id === id &&
+        producto.cantidad < producto.stock
+      ) {
         return {
           ...producto,
           cantidad: producto.cantidad + 1,
@@ -37,7 +40,7 @@ function Carrito() {
     setCarrito(carritoActualizado);
   }
 
-  // Disminuye la cantidad
+  // Disminuye la cantidad sin permitir valores menores a uno
   function disminuirCantidad(id) {
     const carritoActualizado = carrito.map((producto) => {
       if (
@@ -56,7 +59,7 @@ function Carrito() {
     setCarrito(carritoActualizado);
   }
 
-  // Elimina un producto
+  // Elimina completamente un producto del carrito
   function eliminarProducto(id) {
     const carritoActualizado = carrito.filter(
       (producto) => producto.id !== id
@@ -65,7 +68,7 @@ function Carrito() {
     setCarrito(carritoActualizado);
   }
 
-  // Calcula subtotal y cantidad total
+  // Recorre el carrito para calcular los totales
   let subtotal = 0;
   let cantidadTotal = 0;
 
@@ -92,6 +95,7 @@ function Carrito() {
               Productos agregados
             </h2>
 
+            {/* Informa cuando todavía no existen productos */}
             {carrito.length === 0 ? (
               <p className="mb-0">
                 Aún no hay productos agregados al carrito.
