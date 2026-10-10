@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Container } from "react-bootstrap";
 import FormularioTrabajador from "./FormularioTrabajador";
+import ListaTrabajadores from "./ListaTrabajadores";
 
 function Admin() {
-  // Recupera los trabajadores guardados
+  // Recupera los trabajadores guardados al cargar el componente
   const [trabajadores, setTrabajadores] = useState(() => {
     const trabajadoresGuardados =
       localStorage.getItem("trabajadoresSonidoVivo");
@@ -13,8 +14,27 @@ function Admin() {
       : [];
   });
 
-  // Guarda un nuevo trabajador sin almacenar la contraseña
+  // Mantiene localStorage sincronizado con el estado
+  useEffect(() => {
+    localStorage.setItem(
+      "trabajadoresSonidoVivo",
+      JSON.stringify(trabajadores)
+    );
+  }, [trabajadores]);
+
+  // Guarda un trabajador nuevo
   function guardarTrabajador(trabajador) {
+    // Comprueba si el correo ya pertenece a otro trabajador
+    const correoExiste = trabajadores.some(
+      (item) =>
+        item.correo === trabajador.correo
+    );
+
+    // Evita registrar dos trabajadores con el mismo correo
+    if (correoExiste) {
+      return false;
+    }
+
     const nuevoTrabajador = {
       id: trabajadores.length + 1,
       nombre: trabajador.nombre,
@@ -24,16 +44,24 @@ function Admin() {
       rol: trabajador.rol,
     };
 
-    const trabajadoresActualizados = [
+    setTrabajadores([
       ...trabajadores,
       nuevoTrabajador,
-    ];
+    ]);
 
-    setTrabajadores(trabajadoresActualizados);
+    return true;
+  }
 
-    localStorage.setItem(
-      "trabajadoresSonidoVivo",
-      JSON.stringify(trabajadoresActualizados)
+  // Elimina el trabajador que coincide con el id recibido
+  function eliminarTrabajador(id) {
+    const trabajadoresActualizados =
+      trabajadores.filter(
+        (trabajador) =>
+          trabajador.id !== id
+      );
+
+    setTrabajadores(
+      trabajadoresActualizados
     );
   }
 
@@ -47,8 +75,15 @@ function Admin() {
         Registra trabajadores y asigna su rol dentro de Sonido Vivo.
       </p>
 
-      <FormularioTrabajador
-        onGuardar={guardarTrabajador}
+      <div className="mb-5">
+        <FormularioTrabajador
+          onGuardar={guardarTrabajador}
+        />
+      </div>
+
+      <ListaTrabajadores
+        trabajadores={trabajadores}
+        onEliminar={eliminarTrabajador}
       />
     </Container>
   );

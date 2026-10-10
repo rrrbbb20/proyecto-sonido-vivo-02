@@ -87,13 +87,22 @@ function FormularioTrabajador({ onGuardar }) {
       return;
     }
 
-    // Entrega los datos validados al componente padre
-    onGuardar({
-      ...datos,
-      correo: correo,
+    // Entrega los datos al componente padre
+    const guardado = onGuardar({
+    ...datos,
+    correo: correo,
     });
 
-    // Limpia el formulario después de guardar
+    // Informa si el correo ya se encuentra registrado
+    if (!guardado) {
+    setErrores({
+        correo: "Ya existe un trabajador con este correo.",
+    });
+
+    return;
+    }
+
+    // Limpia el formulario después de guardar correctamente
     setDatos(datosIniciales);
     setErrores({});
   }
