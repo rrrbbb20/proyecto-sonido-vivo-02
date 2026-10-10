@@ -100,19 +100,21 @@ function Catalogo({ carrito, setCarrito }) {
       ) : (
         <Row className="g-4">
           {productosFiltrados.map((producto) => {
-            // Comprueba si el producto ya alcanzó su stock máximo en el carrito
+            // Calcula cuánto stock queda después de considerar el carrito
             const productoEnCarrito = carrito.find((item) => item.id === producto.id);
-            const stockAgotado = productoEnCarrito && productoEnCarrito.cantidad >= producto.stock;
+            const cantidadEnCarrito = productoEnCarrito ? productoEnCarrito.cantidad : 0;
+            const stockDisponible = producto.stock - cantidadEnCarrito;
+            const stockAgotado = stockDisponible === 0;
 
             return (
               <Col key={producto.id} xs={12} md={6} lg={4}>
                 <div className="border rounded p-3 h-100 d-flex flex-column">
                   <h3 className="h5">{producto.nombre}</h3>
                   <p className="mb-2">Categoría: {producto.categoriaNombre}</p>
-                  <p className="mb-2">Stock disponible: {producto.stock}</p>
+                  <p className="mb-2">Stock disponible: {stockDisponible}</p>
                   <p className="fw-bold mb-4">Precio: ${producto.precio}</p>
 
-                  {/* Bloquea nuevas unidades cuando se alcanza el stock */}
+                  {/* Bloquea nuevas unidades cuando no queda stock */}
                   <Button
                     variant="primary"
                     className="w-100 mt-auto"
