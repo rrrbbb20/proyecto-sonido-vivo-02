@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Container, Form, Row, Col } from "react-bootstrap";
 
 // Productos disponibles en el catálogo
@@ -29,6 +30,25 @@ const productos = [
 ];
 
 function Catalogo() {
+
+  // Estado para guardar el texto escrito en el buscador
+  const [busqueda, setBusqueda] = useState("");
+
+  // Estado para guardar la categoría seleccionada
+  const [categoria, setCategoria] = useState("");
+
+  // Filtra los productos según el texto y la categoría seleccionada
+  const productosFiltrados = productos.filter((producto) => {
+    const coincideBusqueda = producto.nombre
+      .toLowerCase()
+      .includes(busqueda.toLowerCase());
+
+    const coincideCategoria =
+      categoria === "" || producto.categoria === categoria;
+
+    return coincideBusqueda && coincideCategoria;
+  });
+
   return (
     <Container className="py-4">
       <h1 className="mb-4">Catálogo</h1>
@@ -43,11 +63,16 @@ function Catalogo() {
             <Form.Control
               type="text"
               placeholder="Buscar productos..."
+              value={busqueda}
+              onChange={(evento) => setBusqueda(evento.target.value)}
             />
           </Col>
 
           <Col xs={12} md={4}>
-            <Form.Select>
+            <Form.Select
+              value={categoria}
+              onChange={(evento) => setCategoria(evento.target.value)}
+            >
               <option value="">Todas las categorías</option>
               <option value="guitarras">Guitarras</option>
               <option value="baterias">Baterías</option>
@@ -61,7 +86,7 @@ function Catalogo() {
 
       <Row className="g-4">
         {/* Se recorre el arreglo para mostrar todos los productos */}
-        {productos.map((producto) => (
+        {productosFiltrados.map((producto) => (
           <Col key={producto.id} xs={12} md={6} lg={4}>
             <div className="border rounded p-3 h-100">
               <h3 className="h5">{producto.nombre}</h3>
