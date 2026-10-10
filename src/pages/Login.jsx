@@ -8,13 +8,13 @@ function Login() {
     contrasena: "",
   });
 
-  // Estado que almacena los errores
+  // Estado que almacena los errores encontrados
   const [errores, setErrores] = useState({});
 
-  // Estado para mostrar un mensaje
+  // Estado utilizado para informar un resultado correcto
   const [mensaje, setMensaje] = useState("");
 
-  // Actualiza el campo correspondiente
+  // Actualiza el campo correspondiente mientras el usuario escribe
   function cambiarCampo(evento) {
     const { name, value } = evento.target;
 
@@ -24,24 +24,30 @@ function Login() {
     });
   }
 
-  // Valida el formulario
+  // Valida los datos antes de aceptar el formulario
   function enviarFormulario(evento) {
     evento.preventDefault();
 
     const nuevosErrores = {};
 
+    // Normaliza el correo antes de validarlo
     const correo = datos.correo
       .trim()
       .toLowerCase();
 
     const contrasena = datos.contrasena;
 
-    if (!correo) {
+    // Comprueba que el correo exista y contenga @
+    if (correo === "") {
       nuevosErrores.correo =
         "Ingresa tu correo electrónico.";
+    } else if (!correo.includes("@")) {
+      nuevosErrores.correo =
+        "Ingresa un correo electrónico válido.";
     }
 
-    if (!contrasena) {
+    // Comprueba que la contraseña tenga la longitud permitida
+    if (contrasena === "") {
       nuevosErrores.contrasena =
         "Ingresa tu contraseña.";
     } else if (
@@ -55,6 +61,7 @@ function Login() {
     setErrores(nuevosErrores);
     setMensaje("");
 
+    // Detiene el proceso si existe algún error
     if (Object.keys(nuevosErrores).length > 0) {
       return;
     }
@@ -63,6 +70,7 @@ function Login() {
       "Los datos ingresados cumplen con las validaciones."
     );
 
+    // Limpia el formulario después de una validación correcta
     setDatos({
       correo: "",
       contrasena: "",
@@ -79,6 +87,7 @@ function Login() {
         Ingresa tus datos para acceder a tu cuenta.
       </p>
 
+      {/* Mensaje mostrado solo después de una validación correcta */}
       {mensaje !== "" && (
         <p className="text-success fw-bold">
           {mensaje}

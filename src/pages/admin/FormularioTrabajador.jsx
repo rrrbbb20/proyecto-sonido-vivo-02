@@ -14,10 +14,10 @@ function FormularioTrabajador({ onGuardar }) {
   // Estado que almacena los datos del formulario
   const [datos, setDatos] = useState(datosIniciales);
 
-  // Estado que almacena los errores de validación
+  // Estado que almacena los errores encontrados
   const [errores, setErrores] = useState({});
 
-  // Actualiza el campo correspondiente cuando el usuario escribe
+  // Actualiza el campo correspondiente mientras el usuario escribe
   function cambiarCampo(evento) {
     const { name, value } = evento.target;
 
@@ -33,31 +33,45 @@ function FormularioTrabajador({ onGuardar }) {
 
     const nuevosErrores = {};
 
+    // Normaliza el correo antes de comprobarlo
+    const correo = datos.correo
+      .trim()
+      .toLowerCase();
+
+    // Validación del nombre
     if (datos.nombre.trim().length < 3) {
       nuevosErrores.nombre =
         "El nombre debe tener al menos 3 caracteres.";
     }
 
+    // Validación del apellido
     if (datos.apellido.trim().length < 3) {
       nuevosErrores.apellido =
         "El apellido debe tener al menos 3 caracteres.";
     }
 
-    if (!datos.correo.trim()) {
+    // Validación del correo electrónico
+    if (correo === "") {
       nuevosErrores.correo =
         "Ingresa un correo electrónico.";
+    } else if (!correo.includes("@")) {
+      nuevosErrores.correo =
+        "Ingresa un correo electrónico válido.";
     }
 
+    // Validación de la dirección
     if (datos.direccion.trim().length < 5) {
       nuevosErrores.direccion =
         "La dirección debe tener al menos 5 caracteres.";
     }
 
+    // Validación del rol
     if (!datos.rol) {
       nuevosErrores.rol =
         "Selecciona un rol.";
     }
 
+    // Validación de la contraseña
     if (
       datos.contrasena.length < 8 ||
       datos.contrasena.length > 12
@@ -68,21 +82,31 @@ function FormularioTrabajador({ onGuardar }) {
 
     setErrores(nuevosErrores);
 
-    // Detiene el envío si existen errores
+    // Si existen errores, no se envían los datos
     if (Object.keys(nuevosErrores).length > 0) {
       return;
     }
 
-    onGuardar(datos);
+    // Entrega los datos validados al componente padre
+    onGuardar({
+      ...datos,
+      correo: correo,
+    });
 
+    // Limpia el formulario después de guardar
     setDatos(datosIniciales);
     setErrores({});
   }
 
   return (
-    <Form onSubmit={enviarFormulario} noValidate>
+    <Form
+      onSubmit={enviarFormulario}
+      noValidate
+    >
       <Form.Group className="mb-3">
-        <Form.Label>Nombre</Form.Label>
+        <Form.Label>
+          Nombre
+        </Form.Label>
 
         <Form.Control
           type="text"
@@ -98,7 +122,9 @@ function FormularioTrabajador({ onGuardar }) {
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Apellido</Form.Label>
+        <Form.Label>
+          Apellido
+        </Form.Label>
 
         <Form.Control
           type="text"
@@ -114,7 +140,9 @@ function FormularioTrabajador({ onGuardar }) {
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Correo electrónico</Form.Label>
+        <Form.Label>
+          Correo electrónico
+        </Form.Label>
 
         <Form.Control
           type="email"
@@ -131,7 +159,9 @@ function FormularioTrabajador({ onGuardar }) {
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Dirección</Form.Label>
+        <Form.Label>
+          Dirección
+        </Form.Label>
 
         <Form.Control
           type="text"
@@ -147,7 +177,9 @@ function FormularioTrabajador({ onGuardar }) {
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Rol</Form.Label>
+        <Form.Label>
+          Rol
+        </Form.Label>
 
         <Form.Select
           name="rol"
@@ -174,7 +206,9 @@ function FormularioTrabajador({ onGuardar }) {
       </Form.Group>
 
       <Form.Group className="mb-3">
-        <Form.Label>Contraseña</Form.Label>
+        <Form.Label>
+          Contraseña
+        </Form.Label>
 
         <Form.Control
           type="password"
@@ -189,7 +223,10 @@ function FormularioTrabajador({ onGuardar }) {
         </Form.Control.Feedback>
       </Form.Group>
 
-      <Button type="submit" variant="primary">
+      <Button
+        type="submit"
+        variant="primary"
+      >
         Registrar trabajador
       </Button>
     </Form>
