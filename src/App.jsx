@@ -33,6 +33,19 @@ function App() {
     localStorage.setItem("productosSonidoVivo", JSON.stringify(productos));
   }, [productos]);
   // ---rb
+//usuarios
+  const [usuarios, setUsuarios] = useState(() => {
+  const guardados = localStorage.getItem("usuariosSonidoVivo");
+  return guardados ? JSON.parse(guardados) : [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "usuariosSonidoVivo",
+      JSON.stringify(usuarios)
+    );
+  }, [usuarios]);
+
 
   // Calcula la cantidad total de unidades del carrito
   let cantidadCarrito = 0;
@@ -48,12 +61,14 @@ function App() {
       <main className="container py-4 mb-5">
         <Routes>
           <Route path="/" element={<Inicio />} />
-          <Route path="/registro" element={<Registro />} />
+          <Route path="/registro" element={<Registro usuarios={usuarios} setUsuarios={setUsuarios}/>} />
           {/* anadir esto dentro de element de catalogo: 
           <Catalogo productos={productos}*/}
           
           <Route path="/catalogo" element={<Catalogo carrito={carrito} setCarrito={setCarrito} />} />
           <Route path="/carrito" element={<Carrito carrito={carrito} setCarrito={setCarrito} />} />
+          {/* anadir esto dentro de element de login: 
+          <Route path="/login" element={<Login usuarios={usuarios} />}/>*/}
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/productos" element={<AdminProductos productos={productos} setProductos={setProductos} />} />
