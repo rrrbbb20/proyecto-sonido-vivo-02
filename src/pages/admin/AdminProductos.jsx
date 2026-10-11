@@ -5,7 +5,7 @@ import ListaProductos from "./ListaProductos";
 
 function AdminProductos({ productos, setProductos }) {
   const [productoEditando, setProductoEditando] = useState(null);
-  
+
 function guardarProducto(nuevoProducto) {
     let nuevoId = 1;
     for (const prod of productos) {
@@ -33,3 +33,32 @@ function guardarProducto(nuevoProducto) {
       setProductoEditando(null);
     }
   }
+return (
+    <Container className="py-4">
+      <h1 className="mb-4">Administración de Inventario</h1>
+      <Row className="g-4">
+        <Col xs={12} lg={5}>
+          <div className="border rounded p-4 h-100">
+            <FormularioProducto 
+              onGuardar={guardarProducto}
+              onActualizar={actualizarProducto}
+              productoEditando={productoEditando}
+              onCancelarEdicion={() => setProductoEditando(null)}
+            />
+          </div>
+        </Col>
+        <Col xs={12} lg={7}>
+          <div className="border rounded p-4 h-100">
+            <ListaProductos 
+              productos={productos}
+              onEditar={editarProducto}
+              onEliminar={eliminarProducto}
+            />
+          </div>
+        </Col>
+      </Row>
+    </Container>
+  );
+}
+
+export default AdminProductos;  
