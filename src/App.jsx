@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import Cabecera from "./components/Cabecera";
+import { productos as productosIniciales } from "./data/productos";
 import Navegacion from "./components/Navegacion";
 import Inicio from "./pages/Inicio";
 import Registro from "./pages/Registro";
@@ -8,7 +9,7 @@ import Catalogo from "./pages/Catalogo";
 import Carrito from "./pages/Carrito";
 import Login from "./pages/Login";
 import Admin from "./pages/admin/Admin";
-
+import AdminProductos from "./pages/admin/AdminProductos";
 function App() {
   // Recupera el carrito guardado al cargar la aplicación
   const [carrito, setCarrito] = useState(() => {
@@ -20,6 +21,18 @@ function App() {
   useEffect(() => {
     localStorage.setItem("carritoSonidoVivo", JSON.stringify(carrito));
   }, [carrito]);
+
+  // ESTADO DE PRODUCTOS Aqui ocurre la conexion rb
+  const [productos, setProductos] = useState(() => {
+    const guardados = localStorage.getItem("productosSonidoVivo");
+    // Si hay datos en localStorage, los usa. Si está vacío, carga tu data/productos.js
+    return guardados ? JSON.parse(guardados) : productosIniciales; 
+  });
+
+  useEffect(() => {
+    localStorage.setItem("productosSonidoVivo", JSON.stringify(productos));
+  }, [productos]);
+  // ---rb
 
   // Calcula la cantidad total de unidades del carrito
   let cantidadCarrito = 0;
@@ -36,10 +49,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Inicio />} />
           <Route path="/registro" element={<Registro />} />
+          {/* anadir esto dentro de element de catalogo: 
+          <Catalogo productos={productos}*/}
+          
           <Route path="/catalogo" element={<Catalogo carrito={carrito} setCarrito={setCarrito} />} />
           <Route path="/carrito" element={<Carrito carrito={carrito} setCarrito={setCarrito} />} />
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/productos" element={<AdminProductos productos={productos} setProductos={setProductos} />} />
         </Routes>
       </main>
     </>
