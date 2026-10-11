@@ -33,3 +33,22 @@ function FormularioProducto({ onGuardar, onActualizar, productoEditando, onCance
   function enviarFormulario(evento) {
     evento.preventDefault();
     const nuevosErrores = {};
+if (datos.nombre.trim().length < 3) {
+      nuevosErrores.nombre = "El nombre debe tener al menos 3 caracteres.";
+    }
+
+    if (!datos.categoria) {
+      nuevosErrores.categoria = "Selecciona una categoría.";
+    }
+
+    if (datos.precio === "" || Number(datos.precio) < 0) {
+      nuevosErrores.precio = "El precio debe ser un número positivo.";
+    }
+
+    if (datos.stock === "" || Number(datos.stock) < 0) {
+      nuevosErrores.stock = "El stock no puede ser negativo.";
+    }
+
+    setErrores(nuevosErrores);
+
+    if (Object.keys(nuevosErrores).length > 0) return;
