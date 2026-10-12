@@ -33,6 +33,40 @@ function App() {
     localStorage.setItem("productosSonidoVivo", JSON.stringify(productos));
   }, [productos]);
   // ---rb
+
+  // Sincroniza los productos del carrito cuando cambia el inventario
+  useEffect(() => {
+    setCarrito((carritoAnterior) => {
+      const carritoActualizado = carritoAnterior.map((productoCarrito) => {
+        // Busca el producto actualizado en el inventario
+        const productoInventario = productos.find(
+          (producto) => producto.id === productoCarrito.id
+        );
+
+        // Quita productos eliminados o sin stock
+        if (!productoInventario || productoInventario.stock <= 0) {
+          return null;
+        }
+
+        // Ajusta la cantidad si supera el stock actual
+        const cantidadActualizada =
+          productoCarrito.cantidad > productoInventario.stock
+            ? productoInventario.stock
+            : productoCarrito.cantidad;
+
+        // Actualiza precio, stock y demás datos del producto
+        return {
+          ...productoCarrito,
+          ...productoInventario,
+          cantidad: cantidadActualizada,
+        };
+      });
+
+      // Elimina los productos marcados como null
+      return carritoActualizado.filter((producto) => producto !== null);
+    });
+  }, [productos]);
+  
 //usuarios
   const [usuarios, setUsuarios] = useState(() => {
   const guardados = localStorage.getItem("usuariosSonidoVivo");
