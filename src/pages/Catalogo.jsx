@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
-import { productos } from "../data/productos";
 
-function Catalogo({ carrito, setCarrito }) {
+
+function Catalogo({ productos, carrito, setCarrito }) {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("");
   const [mensaje, setMensaje] = useState("");

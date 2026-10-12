@@ -65,7 +65,7 @@ function App() {
           {/* anadir esto dentro de element de catalogo: 
           <Catalogo productos={productos}*/}
           
-          <Route path="/catalogo" element={<Catalogo carrito={carrito} setCarrito={setCarrito} />} />
+          <Route path="/catalogo" element={<Catalogo productos={productos} carrito={carrito} setCarrito={setCarrito} />} />
           <Route path="/carrito" element={<Carrito carrito={carrito} setCarrito={setCarrito} />} />
           {/* anadir esto dentro de element de login: 
           <Route path="/login" element={<Login usuarios={usuarios} />}/>*/}
