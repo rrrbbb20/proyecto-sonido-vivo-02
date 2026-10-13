@@ -10,6 +10,7 @@ import Carrito from "./pages/Carrito";
 import Login from "./pages/Login";
 import Admin from "./pages/admin/Admin";
 import AdminProductos from "./pages/admin/AdminProductos";
+import DetalleProducto from "./pages/DetalleProducto";
 function App() {
   // Recupera el carrito guardado al cargar la aplicación
   const [carrito, setCarrito] = useState(() => {
@@ -60,7 +61,7 @@ function App() {
 
       <main className="container py-4 mb-5">
         <Routes>
-          <Route path="/" element={<Inicio />} />
+          <Route path="/" element={<Inicio productos={productos} carrito={carrito} setCarrito={setCarrito}/>} />
           <Route path="/registro" element={<Registro usuarios={usuarios} setUsuarios={setUsuarios}/>} />
           {/* anadir esto dentro de element de catalogo: 
           <Catalogo productos={productos}*/}
@@ -72,6 +73,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/productos" element={<AdminProductos productos={productos} setProductos={setProductos} />} />
+
+          <Route path="/producto/:id" element={<DetalleProducto productos={productos} carrito={carrito} setCarrito={setCarrito} />} />
         </Routes>
       </main>
     </>

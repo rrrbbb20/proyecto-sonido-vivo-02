@@ -1,7 +1,7 @@
 import { Container, Row, Col } from "react-bootstrap";
 import { Link } from "react-router-dom";
-
-function Inicio() {
+import TarjetaProducto from "../components/TarjetaProducto";
+function Inicio({ productos, carrito, setCarrito }) {
   return (
     <Container className="py-4">
       {/* Presentación principal de la tienda */}
@@ -81,10 +81,25 @@ function Inicio() {
         </Row>
       </section>
 
-      {/*
-        Los productos recomendados serán incorporados
-        posteriormente por el integrante responsable.
-      */}
+      {/* SECCIÓN DE PRODUCTOS RECOMENDADOS */}
+      <section className="py-5 mt-4 border-top">
+        <h2 className="text-center mb-4 fw-bold">
+          Productos Destacados
+        </h2>
+        
+        <Row className="g-4">
+          {/* Ciclo para mostrar los primeros 3 productos con grilla responsiva */}
+          {productos.slice(0, 3).map((producto) => (
+            <Col key={producto.id} xs={12} md={6} lg={4}>
+              <TarjetaProducto 
+                producto={producto} 
+                carrito={carrito} 
+                setCarrito={setCarrito} 
+              />
+            </Col>
+          ))}
+        </Row>
+      </section>
     </Container>
   );
 }
