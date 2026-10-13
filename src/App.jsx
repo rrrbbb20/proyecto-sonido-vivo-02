@@ -73,6 +73,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/productos" element={<AdminProductos productos={productos} setProductos={setProductos} />} />
+
+          <Route path="/producto/:id" element={<DetalleProducto productos={productos} carrito={carrito} setCarrito={setCarrito} />} />
         </Routes>
       </main>
     </>
