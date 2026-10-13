@@ -1,8 +1,8 @@
 
 import { useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
 
+import { Link, useNavigate } from "react-router-dom";
 import CampoFormulario from "../components/CampoFormulario";
 
 // Valores iniciales del formulario
@@ -56,7 +56,8 @@ function Registro({ usuarios, setUsuarios }) {
   const [datos, setDatos] = useState(datosIniciales);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState("");
-
+// Inicializamos el hook de navegación
+  const navegar = useNavigate();
   // Actualiza los campos del formulario
   function cambiarCampo(evento) {
     const { name, value, type, checked } = evento.target;
@@ -160,7 +161,11 @@ function Registro({ usuarios, setUsuarios }) {
     setDatos({ ...datosIniciales });
     setErrores({});
     setMensaje("¡Registro completado correctamente!");
+    setTimeout(() => {
+      navegar("/");
+    }, 2000);
   }
+  
 
   return (
     <Container className="py-4" style={{ maxWidth: "650px" }}>
