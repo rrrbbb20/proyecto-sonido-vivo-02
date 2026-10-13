@@ -61,7 +61,7 @@ function App() {
 
       <main className="container py-4 mb-5">
         <Routes>
-          <Route path="/" element={<Inicio />} />
+          <Route path="/" element={<Inicio productos={productos} carrito={carrito} setCarrito={setCarrito}/>} />
           <Route path="/registro" element={<Registro usuarios={usuarios} setUsuarios={setUsuarios}/>} />
           {/* anadir esto dentro de element de catalogo: 
           <Catalogo productos={productos}*/}
