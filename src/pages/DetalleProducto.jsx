@@ -74,7 +74,7 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
           
           <h1 className="mb-2 fw-bold display-5">{producto.nombre}</h1>
           <p className="text-muted mb-4 fs-5">
-            {producto.descripcion || "Descripción detallada del instrumento musical y sus características principales."}
+            {producto.descripcion || ""}
           </p>
           
           {/* Formato de precio en línea */}
