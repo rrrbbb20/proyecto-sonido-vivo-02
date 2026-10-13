@@ -10,6 +10,7 @@ import Carrito from "./pages/Carrito";
 import Login from "./pages/Login";
 import Admin from "./pages/admin/Admin";
 import AdminProductos from "./pages/admin/AdminProductos";
+import DetalleProducto from "./pages/DetalleProducto";
 function App() {
   // Recupera el carrito guardado al cargar la aplicación
   const [carrito, setCarrito] = useState(() => {
