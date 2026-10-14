@@ -16,7 +16,7 @@ function ItemCarrito({
       <Row className="g-3 align-items-center">
         <Col xs={12} md={5}>
           <h3 className="h6 mb-2">{producto.nombre}</h3>
-          <p className="mb-1">Precio: ${producto.precio}</p>
+          <p className="mb-1">Precio: ${producto.precio.toLocaleString('es-CL')}</p>
           <p className="mb-0">Stock disponible: {stockDisponible}</p>
         </Col>
 
@@ -52,7 +52,7 @@ function ItemCarrito({
 
         <Col xs={12} md={3}>
           <p className="fw-bold mb-2">
-            Subtotal: ${producto.precio * producto.cantidad}
+            Subtotal: ${(producto.precio * producto.cantidad).toLocaleString}
           </p>
 
           <Button

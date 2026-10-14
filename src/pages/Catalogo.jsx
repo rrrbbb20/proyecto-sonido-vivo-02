@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
-import { productos } from "../data/productos";
 
-function Catalogo({ carrito, setCarrito }) {
+
+function Catalogo({ productos, carrito, setCarrito }) {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("");
   const [mensaje, setMensaje] = useState("");
@@ -112,7 +112,7 @@ function Catalogo({ carrito, setCarrito }) {
                   <h3 className="h5">{producto.nombre}</h3>
                   <p className="mb-2">Categoría: {producto.categoriaNombre}</p>
                   <p className="mb-2">Stock disponible: {stockDisponible}</p>
-                  <p className="fw-bold mb-4">Precio: ${producto.precio}</p>
+                  <p className="fw-bold mb-4">Precio: ${producto.precio.toLocaleString('es-CL')}</p>
 
                   {/* Bloquea nuevas unidades cuando no queda stock */}
                   <Button

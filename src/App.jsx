@@ -34,6 +34,40 @@ function App() {
     localStorage.setItem("productosSonidoVivo", JSON.stringify(productos));
   }, [productos]);
   // ---rb
+
+  // Sincroniza los productos del carrito cuando cambia el inventario
+  useEffect(() => {
+    setCarrito((carritoAnterior) => {
+      const carritoActualizado = carritoAnterior.map((productoCarrito) => {
+        // Busca el producto actualizado en el inventario
+        const productoInventario = productos.find(
+          (producto) => producto.id === productoCarrito.id
+        );
+
+        // Quita productos eliminados o sin stock
+        if (!productoInventario || productoInventario.stock <= 0) {
+          return null;
+        }
+
+        // Ajusta la cantidad si supera el stock actual
+        const cantidadActualizada =
+          productoCarrito.cantidad > productoInventario.stock
+            ? productoInventario.stock
+            : productoCarrito.cantidad;
+
+        // Actualiza precio, stock y demás datos del producto
+        return {
+          ...productoCarrito,
+          ...productoInventario,
+          cantidad: cantidadActualizada,
+        };
+      });
+
+      // Elimina los productos marcados como null
+      return carritoActualizado.filter((producto) => producto !== null);
+    });
+  }, [productos]);
+  
 //usuarios
   const [usuarios, setUsuarios] = useState(() => {
   const guardados = localStorage.getItem("usuariosSonidoVivo");
@@ -66,7 +100,7 @@ function App() {
           {/* anadir esto dentro de element de catalogo: 
           <Catalogo productos={productos}*/}
           
-          <Route path="/catalogo" element={<Catalogo carrito={carrito} setCarrito={setCarrito} />} />
+          <Route path="/catalogo" element={<Catalogo productos={productos} carrito={carrito} setCarrito={setCarrito} />} />
           <Route path="/carrito" element={<Carrito carrito={carrito} setCarrito={setCarrito} />} />
           {/* anadir esto dentro de element de login: 
           <Route path="/login" element={<Login usuarios={usuarios} />}/>*/}
