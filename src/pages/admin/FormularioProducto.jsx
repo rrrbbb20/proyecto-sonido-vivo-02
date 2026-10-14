@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 
 
-import { validarProducto } from "../../../utils/validacionesInventarioProducto";
+import { validarProducto } from "../../utils/validacionesInventarioProducto";
 
 const datosIniciales = {
   nombre: "",
