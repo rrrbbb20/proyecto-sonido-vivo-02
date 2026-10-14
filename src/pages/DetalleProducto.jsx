@@ -43,7 +43,8 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
       </Link>
       
       <Row className="g-5 align-items-center">
-        <Col md={6}>
+        {/* Agregado xs={12} de forma explícita para móviles */}
+        <Col xs={12} md={6}>
           {producto.imagen ? (
             <img 
               src={producto.imagen} 
@@ -61,7 +62,8 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
           )}
         </Col>
         
-        <Col md={6} className="d-flex flex-column">
+        {/* Agregado xs={12} de forma explícita para móviles */}
+        <Col xs={12} md={6} className="d-flex flex-column">
           <Badge bg="secondary" className="align-self-start mb-3 fs-6 text-uppercase px-2 py-1">
             {producto.categoriaNombre || producto.categoria}
           </Badge>
@@ -80,7 +82,7 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
               Stock disponible: <strong className={stockAgotado ? "text-danger" : "text-success"}>{stockDisponible}</strong> unidades
             </p>
             
-            {/* 3. Se muestra la advertencia en amarillo si el stock es 1 o 2 */}
+            {/* Se muestra la advertencia en amarillo si el stock es 1 o 2 */}
             {bajoStock && (
               <p className="text-warning fw-bold mt-2 mb-0">
                 ¡Apresúrate! Quedan las últimas unidades.
