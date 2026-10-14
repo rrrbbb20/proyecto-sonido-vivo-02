@@ -7,6 +7,9 @@ import Inicio from "./pages/Inicio";
 import Registro from "./pages/Registro";
 import Catalogo from "./pages/Catalogo";
 import Carrito from "./pages/Carrito";
+import Confirmacion from "./pages/Confirmacion";
+import Contacto from "./pages/Contacto";
+import Ubicacion from "./pages/Ubicacion"; 
 import Login from "./pages/Login";
 import Admin from "./pages/admin/Admin";
 import AdminProductos from "./pages/admin/AdminProductos";
@@ -107,6 +110,9 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/productos" element={<AdminProductos productos={productos} setProductos={setProductos} />} />
+          <Route path="/confirmacion" element={<Confirmacion />} />
+          <Route path="/contacto" element={<Contacto />} />
+          <Route path="/ubicacion" element={<Ubicacion />} />
 
           <Route path="/producto/:id" element={<DetalleProducto productos={productos} carrito={carrito} setCarrito={setCarrito} />} />
         </Routes>
