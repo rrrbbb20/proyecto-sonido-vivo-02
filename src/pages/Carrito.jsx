@@ -87,9 +87,15 @@ function Carrito({ carrito, setCarrito }) {
             <p className="fw-bold">Total: ${subtotal.toLocaleString('es-CL')}</p>
 
             <div className="d-grid gap-2">
-              <Button variant="primary" disabled={carrito.length === 0}>
+            {carrito.length === 0 ? (
+              <Button variant="primary" className="w-100 mb-2" disabled>
                 Continuar compra
               </Button>
+            ) : (
+              <Link to="/confirmacion" className="btn btn-primary w-100 mb-2">
+                Continuar compra
+              </Link>
+            )}
 
               <Button variant="outline-danger" onClick={vaciarCarrito} disabled={carrito.length === 0}>
                 Vaciar carrito
