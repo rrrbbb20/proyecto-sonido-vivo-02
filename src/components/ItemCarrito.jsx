@@ -52,7 +52,7 @@ function ItemCarrito({
 
         <Col xs={12} md={3}>
           <p className="fw-bold mb-2">
-            Subtotal: ${(producto.precio * producto.cantidad).toLocaleString}
+            Subtotal: ${(producto.precio * producto.cantidad).toLocaleString('es-CL')}
           </p>
 
           <Button
