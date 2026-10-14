@@ -1,3 +1,4 @@
+// src/pages/admin/FormularioProducto.jsx
 import { useEffect, useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 
@@ -6,7 +7,9 @@ const datosIniciales = {
   categoria: "",
   precio: "",
   stock: "",
+  imagen: "", 
 };
+
 function FormularioProducto({ onGuardar, onActualizar, productoEditando, onCancelarEdicion }) {
   const [datos, setDatos] = useState(datosIniciales);
   const [errores, setErrores] = useState({});
@@ -18,6 +21,7 @@ function FormularioProducto({ onGuardar, onActualizar, productoEditando, onCance
         categoria: productoEditando.categoria,
         precio: productoEditando.precio,
         stock: productoEditando.stock,
+        imagen: productoEditando.imagen || "", // Cargamos la imagen si existe
       });
     } else {
       setDatos(datosIniciales);
@@ -33,7 +37,8 @@ function FormularioProducto({ onGuardar, onActualizar, productoEditando, onCance
   function enviarFormulario(evento) {
     evento.preventDefault();
     const nuevosErrores = {};
-if (datos.nombre.trim().length < 3) {
+
+    if (datos.nombre.trim().length < 3) {
       nuevosErrores.nombre = "El nombre debe tener al menos 3 caracteres.";
     }
 
@@ -52,6 +57,7 @@ if (datos.nombre.trim().length < 3) {
     setErrores(nuevosErrores);
 
     if (Object.keys(nuevosErrores).length > 0) return;
+
     // Obtener el nombre visible de la categoría para el catálogo
     const nombresCategorias = {
       guitarras: "Guitarras eléctricas",
@@ -65,6 +71,7 @@ if (datos.nombre.trim().length < 3) {
       categoriaNombre: nombresCategorias[datos.categoria],
       precio: Number(datos.precio),
       stock: Number(datos.stock),
+      imagen: datos.imagen.trim(), // Incluimos la imagen procesada
     };
 
     if (productoEditando) {
@@ -76,6 +83,7 @@ if (datos.nombre.trim().length < 3) {
     setDatos(datosIniciales);
     setErrores({});
   }
+
   return (
     <Form onSubmit={enviarFormulario} noValidate>
       <h2 className="h4 mb-3">
@@ -94,6 +102,20 @@ if (datos.nombre.trim().length < 3) {
               isInvalid={Boolean(errores.nombre)}
             />
             <Form.Control.Feedback type="invalid">{errores.nombre}</Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+
+        {/* campo de entrada para la URL de la imagen */}
+        <Col xs={12}>
+          <Form.Group>
+            <Form.Label>URL de la imagen </Form.Label>
+            <Form.Control
+              type="text"
+              name="imagen"
+              placeholder="https://ejemplo.com/imagen.jpg"
+              value={datos.imagen}
+              onChange={cambiarCampo}
+            />
           </Form.Group>
         </Col>
 

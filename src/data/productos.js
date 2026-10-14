@@ -7,6 +7,7 @@ export const productos = [
     categoriaNombre: "Guitarras eléctricas",
     precio: 319990,
     stock: 3,
+    imagen: ""
   },
   {
     id: 2,
@@ -15,6 +16,7 @@ export const productos = [
     categoriaNombre: "Baterías",
     precio: 599990,
     stock: 2,
+    imagen: ""
   },
   {
     id: 3,
@@ -23,5 +25,6 @@ export const productos = [
     categoriaNombre: "Micrófonos",
     precio: 199990,
     stock: 4,
+    imagen: ""
   },
 ];
