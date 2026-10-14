@@ -1,15 +1,13 @@
 // Archivo: src/pages/DetalleProducto.jsx
 import { useParams, Link } from "react-router-dom";
 import { Container, Row, Col, Button, Badge } from "react-bootstrap";
+// 1. Importamos la nueva función pura
+import { calcularEstadoStock } from "../utils/stock";
 
 function DetalleProducto({ productos, carrito, setCarrito }) {
-  // Extraemos el ID dinámico de la ruta
   const { id } = useParams();
-  
-  // Buscamos la información en el estado central
   const producto = productos.find((p) => p.id === Number(id));
 
-  // Manejo de error si la URL ingresada no coincide con un producto válido
   if (!producto) {
     return (
       <Container className="py-5 text-center">
@@ -20,14 +18,14 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
     );
   }
 
-  // Protección contra sobreventas de stock
-  const productoEnCarrito = carrito.find((item) => item.id === producto.id);
-  const cantidadEnCarrito = productoEnCarrito ? productoEnCarrito.cantidad : 0;
-  const stockDisponible = producto.stock - cantidadEnCarrito;
-  const stockAgotado = stockDisponible <= 0;
+  // 2. Usamos tu función pura para obtener el estado del stock en una sola línea
+  const { stockDisponible, stockAgotado, bajoStock } = calcularEstadoStock(producto.stock, producto.id, carrito);
 
   function agregarAlCarrito() {
     if (stockAgotado) return;
+    
+    // Buscamos si existe para saber si sumar 1 o agregarlo como nuevo
+    const productoEnCarrito = carrito.find((item) => item.id === producto.id);
     
     if (productoEnCarrito) {
       setCarrito(carrito.map((item) =>
@@ -45,8 +43,6 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
       </Link>
       
       <Row className="g-5 align-items-center">
-        
-        {/* COLUMNA IZQUIERDA: LÓGICA DE IMAGEN CON FALLBACK */}
         <Col md={6}>
           {producto.imagen ? (
             <img 
@@ -65,9 +61,7 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
           )}
         </Col>
         
-        {/* COLUMNA DERECHA: INFORMACIÓN Y ACCIONES */}
         <Col md={6} className="d-flex flex-column">
-          {/* Badge nativo para la categoría */}
           <Badge bg="secondary" className="align-self-start mb-3 fs-6 text-uppercase px-2 py-1">
             {producto.categoriaNombre || producto.categoria}
           </Badge>
@@ -77,7 +71,6 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
             {producto.descripcion || ""}
           </p>
           
-          {/* Formato de precio en línea */}
           <h2 className="text-primary mb-4 display-6 fw-bold">
             ${producto.precio.toLocaleString("es-CL")}
           </h2>
@@ -86,6 +79,13 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
             <p className="mb-0 fs-5">
               Stock disponible: <strong className={stockAgotado ? "text-danger" : "text-success"}>{stockDisponible}</strong> unidades
             </p>
+            
+            {/* 3. Se muestra la advertencia en amarillo si el stock es 1 o 2 */}
+            {bajoStock && (
+              <p className="text-warning fw-bold mt-2 mb-0">
+                ¡Apresúrate! Quedan las últimas unidades.
+              </p>
+            )}
           </div>
           
           <Button 
