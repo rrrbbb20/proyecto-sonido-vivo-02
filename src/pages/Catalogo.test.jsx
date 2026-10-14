@@ -35,4 +35,44 @@ describe('Catalogo', () => {
       { ...producto, cantidad: 1 }
     ])
   })
+
+  it('filtra los productos al escribir en el buscador', () => {
+    const productos = [
+        {
+        id: 1,
+        nombre: 'Guitarra eléctrica',
+        categoria: 'guitarras',
+        categoriaNombre: 'Guitarras',
+        precio: 319990,
+        stock: 3
+        },
+        {
+        id: 2,
+        nombre: 'Micrófono',
+        categoria: 'microfonos',
+        categoriaNombre: 'Micrófonos',
+        precio: 49990,
+        stock: 5
+        }
+    ]
+
+    render(
+        <Catalogo
+        productos={productos}
+        carrito={[]}
+        setCarrito={vi.fn()}
+        />
+    )
+
+    // Escribe el nombre de un producto en el buscador
+    fireEvent.change(screen.getByPlaceholderText('Buscar productos...'), {
+        target: { value: 'Guitarra' }
+    })
+
+    // Comprueba que solo aparece el producto buscado
+    expect(screen.getByText('Guitarra eléctrica')).toBeInTheDocument()
+    expect(screen.queryByText('Micrófono')).not.toBeInTheDocument()
+  })
+
+  
 })
