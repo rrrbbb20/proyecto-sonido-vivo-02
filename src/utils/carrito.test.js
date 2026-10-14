@@ -49,4 +49,21 @@ describe('agregarProductoAlCarrito', () => {
 
     expect(resultado).toEqual([])
   })
+
+  it('no permite superar el stock disponible', () => {
+    const producto = {
+        id: 1,
+        nombre: 'Guitarra eléctrica',
+        precio: 319990,
+        stock: 3
+    }
+
+    const carrito = [
+        { ...producto, cantidad: 3 }
+    ]
+
+    const resultado = agregarProductoAlCarrito(carrito, producto)
+
+    expect(resultado).toEqual(carrito)
+  })
 })
