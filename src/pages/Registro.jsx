@@ -1,9 +1,10 @@
-
 import { useState } from "react";
 import { Container, Form, Button, Alert } from "react-bootstrap";
-
 import { Link, useNavigate } from "react-router-dom";
 import CampoFormulario from "../components/CampoFormulario";
+
+// IMPORTAMOS LA NUEVA HERRAMIENTA DESDE UTILS
+import { validarRegistro } from "../utils/validacionesRegistro"; 
 
 // Valores iniciales del formulario
 const datosIniciales = {
@@ -16,49 +17,15 @@ const datosIniciales = {
   terminos: false,
 };
 
-// Validación del RUT chileno mediante módulo 11
-export function validarRutChileno(rut) {
-  const rutLimpio = rut
-    .replace(/\./g, "")
-    .trim()
-    .toUpperCase();
-
-  if (!/^\d{7,8}-[\dK]$/.test(rutLimpio)) {
-    return false;
-  }
-
-  const [numero, digitoIngresado] = rutLimpio.split("-");
-
-  let suma = 0;
-  let multiplicador = 2;
-
-  for (let i = numero.length - 1; i >= 0; i--) {
-    suma += Number(numero[i]) * multiplicador;
-    multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
-  }
-
-  const resto = 11 - (suma % 11);
-
-  let digitoEsperado;
-
-  if (resto === 11) {
-    digitoEsperado = "0";
-  } else if (resto === 10) {
-    digitoEsperado = "K";
-  } else {
-    digitoEsperado = String(resto);
-  }
-
-  return digitoIngresado === digitoEsperado;
-}
-
 function Registro({ usuarios, setUsuarios }) {
   const [datos, setDatos] = useState(datosIniciales);
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState("");
-// Inicializamos el hook de navegación
+  
+  // Inicializamos el hook de navegación
   const navegar = useNavigate();
-  // Actualiza los campos del formulario
+
+  // Actualiza los campos del formulario mientras el usuario escribe
   function cambiarCampo(evento) {
     const { name, value, type, checked } = evento.target;
 
@@ -75,73 +42,23 @@ function Registro({ usuarios, setUsuarios }) {
     setMensaje("");
   }
 
-  // Valida los datos ingresados
-  function validarFormulario() {
-    const nuevosErrores = {};
-
-    if (!datos.nombre.trim()) {
-      nuevosErrores.nombre = "Ingresa tu nombre.";
-    }
-
-    if (!datos.apellido.trim()) {
-      nuevosErrores.apellido = "Ingresa tu apellido.";
-    }
-
-    if (!validarRutChileno(datos.rut)) {
-      nuevosErrores.rut = "Ingresa un RUT válido.";
-    }
-
-    if (
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(datos.correo.trim())
-    ) {
-      nuevosErrores.correo = "Ingresa un correo válido.";
-    }
-
-    if (!/^\d{9}$/.test(datos.telefono.trim())) {
-      nuevosErrores.telefono =
-        "Ingresa 9 dígitos, sin espacios ni +56.";
-    }
-
-    if (
-      datos.contrasena.length < 8 ||
-      datos.contrasena.length > 12
-    ) {
-      nuevosErrores.contrasena =
-        "La contraseña debe tener entre 8 y 12 caracteres.";
-    }
-
-    if (!datos.terminos) {
-      nuevosErrores.terminos =
-        "Debes aceptar los términos y condiciones.";
-    }
-
-    // Evita registrar dos veces el mismo correo
-    const correoExiste = usuarios.some(
-      (usuario) =>
-        usuario.correo.toLowerCase() ===
-        datos.correo.trim().toLowerCase()
-    );
-
-    if (correoExiste) {
-      nuevosErrores.correo =
-        "Este correo ya está registrado.";
-    }
-
-    setErrores(nuevosErrores);
-
-    return Object.keys(nuevosErrores).length === 0;
-  }
-
   // Registra al usuario
   function enviarFormulario(evento) {
     evento.preventDefault();
     setMensaje("");
 
-    if (!validarFormulario()) {
+    // 1. Validamos usando nuestra función externa pura
+    const nuevosErrores = validarRegistro(datos, usuarios);
+    
+    // 2. Guardamos los errores para que se muestren en pantalla
+    setErrores(nuevosErrores);
+
+    // 3. Si hay al menos 1 error, detenemos el envío
+    if (Object.keys(nuevosErrores).length > 0) {
       return;
     }
 
-    // Usuario sin atributo id
+    // 4. Si todo está correcto, creamos el usuario
     const nuevoUsuario = {
       nombre: datos.nombre.trim(),
       apellido: datos.apellido.trim(),
@@ -152,20 +69,22 @@ function Registro({ usuarios, setUsuarios }) {
       rol: "cliente",
     };
 
-    // Agrega el usuario a la lista compartida
+    // Agregamos el usuario a la lista compartida (base de datos temporal)
     setUsuarios((usuariosAnteriores) => [
       ...usuariosAnteriores,
       nuevoUsuario,
     ]);
 
+    // Limpiamos y mostramos éxito
     setDatos({ ...datosIniciales });
     setErrores({});
-    setMensaje("¡Registro completado correctamente!");
+    setMensaje("¡Registro completado correctamente! Redirigiendo...");
+    
+    // Redirigimos a la página principal después de 2 segundos
     setTimeout(() => {
       navegar("/");
     }, 2000);
   }
-  
 
   return (
     <Container className="py-4" style={{ maxWidth: "650px" }}>
