@@ -80,11 +80,11 @@ function Carrito({ carrito, setCarrito }) {
 
             <p>Productos distintos: {carrito.length}</p>
             <p>Cantidad total: {cantidadTotal}</p>
-            <p>Subtotal: ${subtotal}</p>
+            <p>Subtotal: ${subtotal.toLocaleString('es-CL')}</p>
 
             <hr />
 
-            <p className="fw-bold">Total: ${subtotal}</p>
+            <p className="fw-bold">Total: ${subtotal.toLocaleString('es-CL')}</p>
 
             <div className="d-grid gap-2">
               <Button variant="primary" disabled={carrito.length === 0}>
