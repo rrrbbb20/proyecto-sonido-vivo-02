@@ -12,9 +12,12 @@ function CampoFormulario({
 }) {
   return (
     <Form.Group className="mb-3">
-      <Form.Label>{label}</Form.Label>
+      <Form.Label htmlFor={nombre}>
+        {label}
+      </Form.Label>
 
       <Form.Control
+        id={nombre}
         type={tipo}
         name={nombre}
         placeholder={placeholder}

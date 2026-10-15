@@ -1,14 +1,136 @@
-// Archivo: src/pages/admin/AdminProductos.spec.jsx
-import { render, screen } from "@testing-library/react";
+
 import { describe, it, expect, vi } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import AdminProductos from "./AdminProductos";
 
 describe("Componente AdminProductos", () => {
-  it("renderiza correctamente la vista principal de administración", () => {
-    // Le pasamos un arreglo vacío y una función falsa para que no se caiga
-    render(<AdminProductos productos={[]} setProductos={vi.fn()} />);
-    
-    // Verificamos que el título gigante se muestre en pantalla
-    expect(screen.getByText("Administración de Inventario")).toBeInTheDocument();
+  it("muestra el título de administración del inventario", () => {
+    render(
+      <AdminProductos productos={[]} setProductos={vi.fn()} />
+    );
+
+    expect(
+      screen.getByRole("heading", {
+        name: /administración de inventario/i,
+      })
+    ).toBeInTheDocument();
+  });
+
+  it("guarda un producto nuevo con su ID y datos procesados", async () => {
+    const usuario = userEvent.setup();
+    const setProductos = vi.fn();
+
+    render(
+      <AdminProductos productos={[]} setProductos={setProductos} />
+    );
+
+    await usuario.type(
+      screen.getByLabelText(/nombre del producto/i),
+      "Pedal de Efecto"
+    );
+
+    await usuario.selectOptions(
+      screen.getByLabelText(/categoría/i),
+      "guitarras"
+    );
+
+    await usuario.type(
+      screen.getByLabelText(/precio/i),
+      "45000"
+    );
+
+    await usuario.type(
+      screen.getByLabelText(/stock/i),
+      "15"
+    );
+
+    await usuario.click(
+      screen.getByRole("button", { name: /registrar producto/i })
+    );
+
+    expect(setProductos).toHaveBeenCalledWith([
+      {
+        id: 1,
+        nombre: "Pedal de Efecto",
+        categoria: "guitarras",
+        categoriaNombre: "Guitarras eléctricas",
+        precio: 45000,
+        stock: 15,
+        imagen: "",
+      },
+    ]);
+  });
+
+  it("actualiza un producto existente", async () => {
+    const usuario = userEvent.setup();
+    const setProductos = vi.fn();
+
+    const producto = {
+      id: 5,
+      nombre: "Guitarra antigua",
+      categoria: "guitarras",
+      categoriaNombre: "Guitarras eléctricas",
+      precio: 300000,
+      stock: 4,
+      imagen: "",
+    };
+
+    render(
+      <AdminProductos
+        productos={[producto]}
+        setProductos={setProductos}
+      />
+    );
+
+    await usuario.click(
+      screen.getByRole("button", { name: /editar/i })
+    );
+
+    const campoNombre = screen.getByLabelText(
+      /nombre del producto/i
+    );
+
+    await usuario.clear(campoNombre);
+    await usuario.type(campoNombre, "Guitarra actualizada");
+
+    await usuario.click(
+      screen.getByRole("button", { name: /guardar cambios/i })
+    );
+
+    expect(setProductos).toHaveBeenCalledWith([
+      {
+        ...producto,
+        nombre: "Guitarra actualizada",
+      },
+    ]);
+  });
+
+  it("elimina un producto del inventario", async () => {
+    const usuario = userEvent.setup();
+    const setProductos = vi.fn();
+
+    const producto = {
+      id: 5,
+      nombre: "Guitarra antigua",
+      categoria: "guitarras",
+      categoriaNombre: "Guitarras eléctricas",
+      precio: 300000,
+      stock: 4,
+      imagen: "",
+    };
+
+    render(
+      <AdminProductos
+        productos={[producto]}
+        setProductos={setProductos}
+      />
+    );
+
+    await usuario.click(
+      screen.getByRole("button", { name: /eliminar/i })
+    );
+
+    expect(setProductos).toHaveBeenCalledWith([]);
   });
 });
