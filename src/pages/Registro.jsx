@@ -154,18 +154,19 @@ function Registro({ usuarios, setUsuarios }) {
           onChange={cambiarCampo}
         />
 
-        <Form.Group className="mb-3">
-          <Form.Check
-            type="checkbox"
-            name="terminos"
-            label="Acepto los términos y condiciones"
-            checked={datos.terminos}
-            onChange={cambiarCampo}
-            isInvalid={Boolean(errores.terminos)}
-            feedback={errores.terminos}
-            feedbackType="invalid"
-          />
-        </Form.Group>
+        
+        <Form.Check
+          id="terminos"
+          type="checkbox"
+          name="terminos"
+          label="Acepto los términos y condiciones"
+          checked={datos.terminos}
+          onChange={cambiarCampo}
+          isInvalid={Boolean(errores.terminos)}
+          feedback={errores.terminos}
+          feedbackType="invalid"
+        />
+
 
         <Button type="submit" className="w-100">
           Registrarme
