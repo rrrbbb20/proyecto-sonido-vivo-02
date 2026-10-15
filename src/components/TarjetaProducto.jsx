@@ -1,16 +1,17 @@
 import { Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+// 1. Importamos la utilidad que ya habías creado
+import { calcularEstadoStock } from "../utils/stock";
 
 function TarjetaProducto({ producto, carrito, setCarrito }) {
-  // 1. Restauramos la lógica para saber si hay stock
-  const productoEnCarrito = carrito.find((item) => item.id === producto.id);
-  const cantidadEnCarrito = productoEnCarrito ? productoEnCarrito.cantidad : 0;
-  const stockDisponible = producto.stock - cantidadEnCarrito;
-  const stockAgotado = stockDisponible <= 0;
+  // 2. Reemplazamos las 4 líneas matemáticas por una sola llamada elegante
+  const { stockAgotado } = calcularEstadoStock(producto.stock, producto.id, carrito);
 
-  // 2. Restauramos la función de comprar
+  // La función de comprar se queda exactamente igual (como acordamos no tocar el carrito)
   function agregarAlCarrito() {
     if (stockAgotado) return;
+    
+    const productoEnCarrito = carrito.find((item) => item.id === producto.id);
     
     if (productoEnCarrito) {
       setCarrito(carrito.map((item) =>
@@ -23,10 +24,6 @@ function TarjetaProducto({ producto, carrito, setCarrito }) {
 
   return (
     <Card className="h-100 shadow-sm border-0">
-      {/* 
-        Envolvemos la imagen y los textos en el Link. 
-        Al hacer clic en cualquier parte de la foto o el título, irá al detalle.
-      */}
       <Link to={`/producto/${producto.id}`} className="text-decoration-none text-dark d-flex flex-column h-100">
         
         {producto.imagen ? (
@@ -54,13 +51,8 @@ function TarjetaProducto({ producto, carrito, setCarrito }) {
             ${producto.precio.toLocaleString("es-CL")}
           </Card.Text>
         </Card.Body>
-
       </Link>
 
-      {/* 
-        El botón de comprar queda AFUERA del Link.
-        Usamos Card.Footer para anclarlo siempre al fondo de la tarjeta.
-      */}
       <Card.Footer className="bg-white border-0 pt-0 pb-3 px-3">
         <Button
           variant="primary"
