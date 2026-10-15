@@ -1,56 +1,40 @@
-import { useState } from "react";
+
 import { Container, Row, Col } from "react-bootstrap";
 import FormularioProducto from "./FormularioProducto";
 import ListaProductos from "./ListaProductos";
 import { calcularNuevoId } from "../../utils/inventario";
+
 function AdminProductos({ productos, setProductos }) {
-  const [productoEditando, setProductoEditando] = useState(null);
-
-function guardarProducto(nuevoProducto) {
-    // Usamos nuestra calculadora externa para obtener el ID
+  function guardarProducto(nuevoProducto) {
     const nuevoId = calcularNuevoId(productos);
-    
-    // Guardamos el producto con su nuevo ID
-    setProductos([...productos, { ...nuevoProducto, id: nuevoId }]);
-  }
 
-  function editarProducto(producto) {
-    setProductoEditando(producto);
-  }
-
-  function actualizarProducto(productoActualizado) {
-    const productosActualizados = productos.map((prod) => 
-      prod.id === productoActualizado.id ? productoActualizado : prod
-    );
-    setProductos(productosActualizados);
-    setProductoEditando(null);
+    setProductos([
+      ...productos,
+      { ...nuevoProducto, id: nuevoId },
+    ]);
   }
 
   function eliminarProducto(id) {
     setProductos(productos.filter((prod) => prod.id !== id));
-    if (productoEditando && productoEditando.id === id) {
-      setProductoEditando(null);
-    }
   }
-return (
+
+  return (
     <Container className="py-4">
-      <h1 className="mb-4">Administración de Inventario</h1>
+      <h1 className="mb-4 text-center text-lg-start">
+        Administración de Inventario
+      </h1>
+
       <Row className="g-4">
-        <Col xs={12} lg={5}>
-          <div className="border rounded p-4 h-100">
-            <FormularioProducto 
-              onGuardar={guardarProducto}
-              onActualizar={actualizarProducto}
-              productoEditando={productoEditando}
-              onCancelarEdicion={() => setProductoEditando(null)}
-            />
+        <Col xs={12} md={12} lg={5}>
+          <div className="border rounded p-4 h-100 shadow-sm bg-white">
+            <FormularioProducto onGuardar={guardarProducto} />
           </div>
         </Col>
-        <Col xs={12} lg={7}>
-          <div className="border rounded p-4 h-100">
-            <ListaProductos 
+
+        <Col xs={12} md={12} lg={7}>
+          <div className="border rounded p-4 h-100 shadow-sm bg-white">
+            <ListaProductos
               productos={productos}
-              onEditar={editarProducto}
               onEliminar={eliminarProducto}
             />
           </div>
@@ -60,4 +44,4 @@ return (
   );
 }
 
-export default AdminProductos;  
+export default AdminProductos;

@@ -1,44 +1,69 @@
-// Archivo: src/pages/admin/FormularioProducto.spec.jsx
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import FormularioProducto from "./FormularioProducto";
 
 describe("Componente FormularioProducto", () => {
-  it("muestra errores si se intenta guardar un producto vacío (Validación visual)", async () => {
-    const mockGuardar = vi.fn();
+  it("muestra errores si se intenta guardar un producto vacío", async () => {
     const usuario = userEvent.setup();
+    const mockGuardar = vi.fn();
 
-    render(<FormularioProducto onGuardar={mockGuardar} onActualizar={vi.fn()} onCancelarEdicion={vi.fn()} />);
+    render(<FormularioProducto onGuardar={mockGuardar} />);
 
-    // Buscamos el botón de registrar y le damos clic sin llenar nada
-    const botonSubmit = screen.getByRole("button", { name: /registrar producto/i });
-    await usuario.click(botonSubmit);
+    await usuario.click(
+      screen.getByRole("button", { name: /registrar producto/i })
+    );
 
-    // Comprobamos que aparezca la advertencia roja
-    expect(screen.getByText("El nombre debe tener al menos 3 caracteres.")).toBeInTheDocument();
-    
-    // Y verificamos que NO se haya llamado a la función de guardar
+    expect(
+      screen.getByText("El nombre debe tener al menos 3 caracteres.")
+    ).toBeInTheDocument();
+
     expect(mockGuardar).not.toHaveBeenCalled();
   });
 
-  it("permite escribir en los campos y envía los datos correctamente (Simulación de tipeo)", async () => {
-    const mockGuardar = vi.fn();
+  it("registra un producto válido con sus datos procesados", async () => {
     const usuario = userEvent.setup();
+    const mockGuardar = vi.fn();
 
-    render(<FormularioProducto onGuardar={mockGuardar} onActualizar={vi.fn()} onCancelarEdicion={vi.fn()} />);
+    render(<FormularioProducto onGuardar={mockGuardar} />);
 
-    // 1. Simulamos a un administrador tecleando en los campos
-    await usuario.type(screen.getByLabelText(/nombre del producto/i), "Pedal de Efecto");
-    await usuario.selectOptions(screen.getByLabelText(/categoría/i), "guitarras");
-    await usuario.type(screen.getByLabelText(/precio/i), "45000");
-    await usuario.type(screen.getByLabelText(/stock/i), "15");
+    await usuario.type(
+      screen.getByLabelText(/nombre del producto/i),
+      "Pedal de Efecto"
+    );
 
-    // 2. Hacemos clic en guardar
-    const botonSubmit = screen.getByRole("button", { name: /registrar producto/i });
-    await usuario.click(botonSubmit);
+    await usuario.selectOptions(
+      screen.getByLabelText(/categoría/i),
+      "guitarras"
+    );
 
-    // 3. Comprobamos que la función espía se haya ejecutado exitosamente 1 vez
+    await usuario.type(
+      screen.getByLabelText(/precio/i),
+      "45000"
+    );
+
+    await usuario.type(
+      screen.getByLabelText(/stock/i),
+      "15"
+    );
+
+    await usuario.click(
+      screen.getByRole("button", { name: /registrar producto/i })
+    );
+
     expect(mockGuardar).toHaveBeenCalledTimes(1);
+    expect(mockGuardar).toHaveBeenCalledWith({
+      nombre: "Pedal de Efecto",
+      categoria: "guitarras",
+      categoriaNombre: "Guitarras eléctricas",
+      precio: 45000,
+      stock: 15,
+      imagen: "",
+    });
+
+    expect(
+      screen.getByLabelText(/nombre del producto/i)
+    ).toHaveValue("");
   });
 });

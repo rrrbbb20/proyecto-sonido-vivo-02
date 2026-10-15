@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { Container, Form, Button, Alert } from "react-bootstrap";
+import { Container, Form, Button, Alert, Row, Col, Card } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
 import CampoFormulario from "../components/CampoFormulario";
-
-// IMPORTAMOS LA NUEVA HERRAMIENTA DESDE UTILS
 import { validarRegistro } from "../utils/validacionesRegistro"; 
 
-// Valores iniciales del formulario
 const datosIniciales = {
   nombre: "",
   apellido: "",
@@ -22,43 +19,32 @@ function Registro({ usuarios, setUsuarios }) {
   const [errores, setErrores] = useState({});
   const [mensaje, setMensaje] = useState("");
   
-  // Inicializamos el hook de navegación
   const navegar = useNavigate();
 
-  // Actualiza los campos del formulario mientras el usuario escribe
   function cambiarCampo(evento) {
     const { name, value, type, checked } = evento.target;
-
     setDatos((datosAnteriores) => ({
       ...datosAnteriores,
       [name]: type === "checkbox" ? checked : value,
     }));
-
     setErrores((erroresAnteriores) => ({
       ...erroresAnteriores,
       [name]: "",
     }));
-
     setMensaje("");
   }
 
-  // Registra al usuario
   function enviarFormulario(evento) {
     evento.preventDefault();
     setMensaje("");
 
-    // 1. Validamos usando nuestra función externa pura
     const nuevosErrores = validarRegistro(datos, usuarios);
-    
-    // 2. Guardamos los errores para que se muestren en pantalla
     setErrores(nuevosErrores);
 
-    // 3. Si hay al menos 1 error, detenemos el envío
     if (Object.keys(nuevosErrores).length > 0) {
       return;
     }
 
-    // 4. Si todo está correcto, creamos el usuario
     const nuevoUsuario = {
       nombre: datos.nombre.trim(),
       apellido: datos.apellido.trim(),
@@ -69,114 +55,133 @@ function Registro({ usuarios, setUsuarios }) {
       rol: "cliente",
     };
 
-    // Agregamos el usuario a la lista compartida (base de datos temporal)
     setUsuarios((usuariosAnteriores) => [
       ...usuariosAnteriores,
       nuevoUsuario,
     ]);
 
-    // Limpiamos y mostramos éxito
     setDatos({ ...datosIniciales });
     setErrores({});
     setMensaje("¡Registro completado correctamente! Redirigiendo...");
     
-    // Redirigimos a la página principal después de 2 segundos
     setTimeout(() => {
       navegar("/");
     }, 2000);
   }
 
   return (
-    <Container className="py-4" style={{ maxWidth: "650px" }}>
-      <h1 className="mb-4">Crear cuenta</h1>
+    <Container className="py-5" style={{ maxWidth: "800px" }}>
+      <Card className="shadow-sm border-0 rounded-4">
+        <Card.Body className="p-4 p-md-5">
+          <h2 className="mb-4 text-center fw-bold">Crear cuenta</h2>
 
-      {mensaje && (
-        <Alert variant="success" role="status">
-          {mensaje}
-        </Alert>
-      )}
+          {mensaje && (
+            <Alert variant="success" role="status" className="text-center">
+              {mensaje}
+            </Alert>
+          )}
 
-      <Form onSubmit={enviarFormulario} noValidate>
-        <CampoFormulario
-          label="Nombre"
-          nombre="nombre"
-          placeholder="Ingresa tu nombre"
-          datos={datos}
-          errores={errores}
-          onChange={cambiarCampo}
-        />
+          <Form onSubmit={enviarFormulario} noValidate>
+            
+            {/* xs=12 (Celular: 100%), md=12 (Tablet: 100%), lg=6 (PC: 50%) */}
+            <Row className="g-3 mb-3">
+              <Col xs={12} md={12} lg={6}>
+                <CampoFormulario
+                  label="Nombre"
+                  nombre="nombre"
+                  placeholder="Ingresa tu nombre"
+                  datos={datos}
+                  errores={errores}
+                  onChange={cambiarCampo}
+                />
+              </Col>
+              <Col xs={12} md={12} lg={6}>
+                <CampoFormulario
+                  label="Apellido"
+                  nombre="apellido"
+                  placeholder="Ingresa tu apellido"
+                  datos={datos}
+                  errores={errores}
+                  onChange={cambiarCampo}
+                />
+              </Col>
+            </Row>
 
-        <CampoFormulario
-          label="Apellido"
-          nombre="apellido"
-          placeholder="Ingresa tu apellido"
-          datos={datos}
-          errores={errores}
-          onChange={cambiarCampo}
-        />
+            {/* xs=12 (Celular: 100%), md=12 (Tablet: 100%), lg=6 (PC: 50%) */}
+            <Row className="g-3 mb-3">
+              <Col xs={12} md={12} lg={6}>
+                <CampoFormulario
+                  label="RUT"
+                  nombre="rut"
+                  placeholder="12345678-5"
+                  datos={datos}
+                  errores={errores}
+                  onChange={cambiarCampo}
+                />
+              </Col>
+              <Col xs={12} md={12} lg={6}>
+                <CampoFormulario
+                  label="Teléfono"
+                  nombre="telefono"
+                  tipo="tel"
+                  placeholder="912345678"
+                  datos={datos}
+                  errores={errores}
+                  onChange={cambiarCampo}
+                />
+              </Col>
+            </Row>
 
-        <CampoFormulario
-          label="RUT"
-          nombre="rut"
-          placeholder="12345678-5"
-          datos={datos}
-          errores={errores}
-          onChange={cambiarCampo}
-        />
+            <div className="mb-3">
+              <CampoFormulario
+                label="Correo electrónico"
+                nombre="correo"
+                tipo="email"
+                placeholder="correo@ejemplo.cl"
+                datos={datos}
+                errores={errores}
+                onChange={cambiarCampo}
+              />
+            </div>
 
-        <CampoFormulario
-          label="Correo electrónico"
-          nombre="correo"
-          tipo="email"
-          placeholder="correo@ejemplo.cl"
-          datos={datos}
-          errores={errores}
-          onChange={cambiarCampo}
-        />
+            <div className="mb-4">
+              <CampoFormulario
+                label="Contraseña"
+                nombre="contrasena"
+                tipo="password"
+                placeholder="Entre 8 y 12 caracteres"
+                datos={datos}
+                errores={errores}
+                onChange={cambiarCampo}
+              />
+            </div>
 
-        <CampoFormulario
-          label="Teléfono"
-          nombre="telefono"
-          tipo="tel"
-          placeholder="912345678"
-          datos={datos}
-          errores={errores}
-          onChange={cambiarCampo}
-        />
+            <Form.Check
+              className="mb-4"
+              id="terminos"
+              type="checkbox"
+              name="terminos"
+              label="Acepto los términos y condiciones"
+              checked={datos.terminos}
+              onChange={cambiarCampo}
+              isInvalid={Boolean(errores.terminos)}
+              feedback={errores.terminos}
+              feedbackType="invalid"
+            />
 
-        <CampoFormulario
-          label="Contraseña"
-          nombre="contrasena"
-          tipo="password"
-          placeholder="Entre 8 y 12 caracteres"
-          datos={datos}
-          errores={errores}
-          onChange={cambiarCampo}
-        />
+            <Button variant="primary" type="submit" size="lg" className="w-100 fw-bold shadow-sm">
+              Registrarme
+            </Button>
+          </Form>
 
-        
-        <Form.Check
-          id="terminos"
-          type="checkbox"
-          name="terminos"
-          label="Acepto los términos y condiciones"
-          checked={datos.terminos}
-          onChange={cambiarCampo}
-          isInvalid={Boolean(errores.terminos)}
-          feedback={errores.terminos}
-          feedbackType="invalid"
-        />
-
-
-        <Button type="submit" className="w-100">
-          Registrarme
-        </Button>
-      </Form>
-
-      <p className="mt-3 text-center">
-        ¿Ya tienes una cuenta?{" "}
-        <Link to="/login">Inicia sesión</Link>
-      </p>
+          <p className="mt-4 text-center mb-0 text-muted">
+            ¿Ya tienes una cuenta?{" "}
+            <Link to="/login" className="text-decoration-none fw-semibold">
+              Inicia sesión aquí
+            </Link>
+          </p>
+        </Card.Body>
+      </Card>
     </Container>
   );
 }

@@ -2,7 +2,7 @@ import { useParams, Link } from "react-router-dom";
 import { Container, Row, Col, Button, Badge } from "react-bootstrap";
 import { calcularEstadoStock } from "../utils/stock";
 
-// 1. Importamos la función de tu compañero
+
 import { agregarProductoAlCarrito } from "../utils/carrito";
 
 function DetalleProducto({ productos, carrito, setCarrito }) {
@@ -23,10 +23,7 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
 
   
   function agregarAlCarrito() {
-    // Paso 1: Calculamos y guardamos en una variable temporal
     const nuevoCarrito = agregarProductoAlCarrito(carrito, producto);
-    
-    // Paso 2: Le pasamos esa variable a React
     setCarrito(nuevoCarrito);
   }
 

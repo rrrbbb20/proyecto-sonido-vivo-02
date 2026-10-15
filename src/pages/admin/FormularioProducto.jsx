@@ -1,5 +1,5 @@
-// src/pages/admin/FormularioProducto.jsx
-import { useEffect, useState } from "react";
+
+import { useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { validarProducto } from "../../utils/validacionesInventarioProducto";
 
@@ -11,34 +11,17 @@ const datosIniciales = {
   imagen: "",
 };
 
-function FormularioProducto({
-  onGuardar,
-  onActualizar,
-  productoEditando,
-  onCancelarEdicion,
-}) {
+function FormularioProducto({ onGuardar }) {
   const [datos, setDatos] = useState(datosIniciales);
   const [errores, setErrores] = useState({});
 
-  useEffect(() => {
-    if (productoEditando) {
-      setDatos({
-        nombre: productoEditando.nombre,
-        categoria: productoEditando.categoria,
-        precio: productoEditando.precio,
-        stock: productoEditando.stock,
-        imagen: productoEditando.imagen || "",
-      });
-    } else {
-      setDatos(datosIniciales);
-    }
-
-    setErrores({});
-  }, [productoEditando]);
-
   function cambiarCampo(evento) {
     const { name, value } = evento.target;
-    setDatos({ ...datos, [name]: value });
+
+    setDatos((datosAnteriores) => ({
+      ...datosAnteriores,
+      [name]: value,
+    }));
   }
 
   function enviarFormulario(evento) {
@@ -47,7 +30,9 @@ function FormularioProducto({
     const nuevosErrores = validarProducto(datos);
     setErrores(nuevosErrores);
 
-    if (Object.keys(nuevosErrores).length > 0) return;
+    if (Object.keys(nuevosErrores).length > 0) {
+      return;
+    }
 
     const nombresCategorias = {
       guitarras: "Guitarras eléctricas",
@@ -64,24 +49,15 @@ function FormularioProducto({
       imagen: datos.imagen.trim(),
     };
 
-    if (productoEditando) {
-      onActualizar({
-        id: productoEditando.id,
-        ...productoProcesado,
-      });
-    } else {
-      onGuardar(productoProcesado);
-    }
+    onGuardar(productoProcesado);
 
-    setDatos(datosIniciales);
+    setDatos({ ...datosIniciales });
     setErrores({});
   }
 
   return (
     <Form onSubmit={enviarFormulario} noValidate>
-      <h2 className="h4 mb-3">
-        {productoEditando ? "Editar producto" : "Registrar producto"}
-      </h2>
+      <h2 className="h4 mb-3">Registrar producto</h2>
 
       <Row className="g-3">
         <Col xs={12}>
@@ -149,9 +125,7 @@ function FormularioProducto({
 
         <Col xs={12} md={4}>
           <Form.Group>
-            <Form.Label htmlFor="precio">
-              Precio ($)
-            </Form.Label>
+            <Form.Label htmlFor="precio">Precio ($)</Form.Label>
 
             <Form.Control
               id="precio"
@@ -170,9 +144,7 @@ function FormularioProducto({
 
         <Col xs={12} md={4}>
           <Form.Group>
-            <Form.Label htmlFor="stock">
-              Stock
-            </Form.Label>
+            <Form.Label htmlFor="stock">Stock</Form.Label>
 
             <Form.Control
               id="stock"
@@ -192,20 +164,8 @@ function FormularioProducto({
 
       <div className="d-flex gap-2 flex-wrap mt-4">
         <Button type="submit" variant="primary">
-          {productoEditando
-            ? "Guardar cambios"
-            : "Registrar producto"}
+          Registrar producto
         </Button>
-
-        {productoEditando && (
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={onCancelarEdicion}
-          >
-            Cancelar edición
-          </Button>
-        )}
       </div>
     </Form>
   );
