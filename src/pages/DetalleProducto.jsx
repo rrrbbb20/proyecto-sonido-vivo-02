@@ -1,8 +1,9 @@
-// Archivo: src/pages/DetalleProducto.jsx
 import { useParams, Link } from "react-router-dom";
 import { Container, Row, Col, Button, Badge } from "react-bootstrap";
-// 1. Importamos la nueva función pura
 import { calcularEstadoStock } from "../utils/stock";
+
+// 1. Importamos la función de tu compañero
+import { agregarProductoAlCarrito } from "../utils/carrito";
 
 function DetalleProducto({ productos, carrito, setCarrito }) {
   const { id } = useParams();
@@ -18,22 +19,15 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
     );
   }
 
-  // 2. Usamos tu función pura para obtener el estado del stock en una sola línea
   const { stockDisponible, stockAgotado, bajoStock } = calcularEstadoStock(producto.stock, producto.id, carrito);
 
+  
   function agregarAlCarrito() {
-    if (stockAgotado) return;
+    // Paso 1: Calculamos y guardamos en una variable temporal
+    const nuevoCarrito = agregarProductoAlCarrito(carrito, producto);
     
-    // Buscamos si existe para saber si sumar 1 o agregarlo como nuevo
-    const productoEnCarrito = carrito.find((item) => item.id === producto.id);
-    
-    if (productoEnCarrito) {
-      setCarrito(carrito.map((item) =>
-        item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
-      ));
-    } else {
-      setCarrito([...carrito, { ...producto, cantidad: 1 }]);
-    }
+    // Paso 2: Le pasamos esa variable a React
+    setCarrito(nuevoCarrito);
   }
 
   return (
@@ -43,7 +37,6 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
       </Link>
       
       <Row className="g-5 align-items-center">
-        {/* Agregado xs={12} de forma explícita para móviles */}
         <Col xs={12} md={6}>
           {producto.imagen ? (
             <img 
@@ -62,7 +55,6 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
           )}
         </Col>
         
-        {/* Agregado xs={12} de forma explícita para móviles */}
         <Col xs={12} md={6} className="d-flex flex-column">
           <Badge bg="secondary" className="align-self-start mb-3 fs-6 text-uppercase px-2 py-1">
             {producto.categoriaNombre || producto.categoria}
@@ -82,7 +74,6 @@ function DetalleProducto({ productos, carrito, setCarrito }) {
               Stock disponible: <strong className={stockAgotado ? "text-danger" : "text-success"}>{stockDisponible}</strong> unidades
             </p>
             
-            {/* Se muestra la advertencia en amarillo si el stock es 1 o 2 */}
             {bajoStock && (
               <p className="text-warning fw-bold mt-2 mb-0">
                 ¡Apresúrate! Quedan las últimas unidades.

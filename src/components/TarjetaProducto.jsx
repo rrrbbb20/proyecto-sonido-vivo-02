@@ -1,25 +1,19 @@
 import { Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-// 1. Importamos la utilidad que ya habías creado
 import { calcularEstadoStock } from "../utils/stock";
 
+import { agregarProductoAlCarrito } from "../utils/carrito";
+
 function TarjetaProducto({ producto, carrito, setCarrito }) {
-  // 2. Reemplazamos las 4 líneas matemáticas por una sola llamada elegante
   const { stockAgotado } = calcularEstadoStock(producto.stock, producto.id, carrito);
 
-  // La función de comprar se queda exactamente igual (como acordamos no tocar el carrito)
+
   function agregarAlCarrito() {
-    if (stockAgotado) return;
-    
-    const productoEnCarrito = carrito.find((item) => item.id === producto.id);
-    
-    if (productoEnCarrito) {
-      setCarrito(carrito.map((item) =>
-        item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
-      ));
-    } else {
-      setCarrito([...carrito, { ...producto, cantidad: 1 }]);
-    }
+    // Paso 1: Calculamos y guardamos en una variable temporal
+    const nuevoCarrito = agregarProductoAlCarrito(carrito, producto);
+  
+  // Paso 2: pasamos esa variable 
+    setCarrito(nuevoCarrito);
   }
 
   return (
