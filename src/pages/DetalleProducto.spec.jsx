@@ -11,7 +11,7 @@ describe("Componente DetalleProducto", () => {
   ];
 
   it("muestra la pantalla de error si el ID del producto no existe (Error)", () => {
-    // Simulamos que el usuario navegó a /producto/999 (MemoryRouter es ideal para esto)
+    
     render(
       <MemoryRouter initialEntries={["/producto/999"]}>
         <Routes>
@@ -27,8 +27,8 @@ describe("Componente DetalleProducto", () => {
   });
 
   it("ejecuta setCarrito al presionar 'Agregar al carrito' (Evento y Mock)", async () => {
-    const usuario = userEvent.setup(); // Creamos al usuario virtual
-    const mockSetCarrito = vi.fn();    // Creamos el espía que pide la Guía 14
+    const usuario = userEvent.setup();
+    const mockSetCarrito = vi.fn();    
     
     render(
       <MemoryRouter initialEntries={["/producto/1"]}>
@@ -41,13 +41,13 @@ describe("Componente DetalleProducto", () => {
       </MemoryRouter>
     );
     
-    // Buscamos el botón por su rol (buenas prácticas de accesibilidad)
+
     const boton = screen.getByRole("button", { name: /agregar al carrito/i });
     
-    // El usuario hace clic
+
     await usuario.click(boton);
     
-    // Comprobamos que el botón efectivamente llamó a nuestra función espía
+
     expect(mockSetCarrito).toHaveBeenCalled();
   });
 });

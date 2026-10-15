@@ -1,35 +1,68 @@
-// Archivo: src/pages/admin/ListaProductos.spec.jsx
+
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, it, expect, vi } from "vitest";
 import ListaProductos from "./ListaProductos";
 
 describe("Componente ListaProductos", () => {
-  it("muestra un mensaje amigable cuando no hay productos (Estado vacío)", () => {
-    // Le pasamos un arreglo vacío de productos
-    render(<ListaProductos productos={[]} onEditar={vi.fn()} onEliminar={vi.fn()} />);
-    
-    expect(screen.getByText("No hay productos registrados en el inventario.")).toBeInTheDocument();
+  it("muestra un mensaje cuando no hay productos", () => {
+    render(
+      <ListaProductos
+        productos={[]}
+        onEliminar={vi.fn()}
+      />
+    );
+
+    expect(
+      screen.getByText(
+        "No hay productos registrados en el inventario."
+      )
+    ).toBeInTheDocument();
   });
 
-  it("renderiza los productos y dispara onEliminar al hacer clic (Interacción y Mock)", async () => {
-    const mockEliminar = vi.fn(); // Creamos el espía
+  it("muestra los productos y permite eliminarlos", async () => {
     const usuario = userEvent.setup();
-    
+    const mockEliminar = vi.fn();
+
     const productosPrueba = [
-      { id: 1, nombre: "Batería Mapex", categoriaNombre: "Baterías", precio: 600000, stock: 3 }
+      {
+        id: 1,
+        nombre: "Batería Mapex",
+        categoriaNombre: "Baterías",
+        precio: 600000,
+        stock: 3,
+      },
     ];
 
-    render(<ListaProductos productos={productosPrueba} onEditar={vi.fn()} onEliminar={mockEliminar} />);
+    render(
+      <ListaProductos
+        productos={productosPrueba}
+        onEliminar={mockEliminar}
+      />
+    );
 
-    // Comprobamos que el nombre del producto se pintó en pantalla
-    expect(screen.getByText("Batería Mapex")).toBeInTheDocument();
+    expect(
+      screen.getByText("Batería Mapex")
+    ).toBeInTheDocument();
 
-    // Buscamos el botón de eliminar y le hacemos clic
-    const botonEliminar = screen.getByRole("button", { name: /eliminar/i });
-    await usuario.click(botonEliminar);
+    expect(
+      screen.getByText("Baterías")
+    ).toBeInTheDocument();
 
-    // Comprobamos que la función espía haya recibido el ID 1 al hacer clic
+    expect(
+      screen.getByText("Stock: 3 unidades")
+    ).toBeInTheDocument();
+
+    await usuario.click(
+      screen.getByRole("button", { name: /eliminar/i })
+    );
+
+    expect(mockEliminar).toHaveBeenCalledTimes(1);
     expect(mockEliminar).toHaveBeenCalledWith(1);
+
+    
+    expect(
+      screen.queryByRole("button", { name: /editar/i })
+    ).not.toBeInTheDocument();
   });
 });

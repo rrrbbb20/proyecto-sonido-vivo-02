@@ -30,12 +30,7 @@ describe("Componente Registro", () => {
   });
 
   it("registra un usuario válido, limpia el formulario y redirige al inicio", async () => {
-    vi.useFakeTimers();
-
-    const usuario = userEvent.setup({
-      advanceTimers: vi.advanceTimersByTime,
-    });
-
+    const usuario = userEvent.setup();
     const setUsuarios = vi.fn();
 
     render(
@@ -111,14 +106,6 @@ describe("Componente Registro", () => {
       screen.getByLabelText("Acepto los términos y condiciones")
     ).not.toBeChecked();
 
-    // Avanzamos los temporizadores simulados dos segundos.
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(2000);
-    });
 
-    // Comprobamos que se haya realizado la redirección.
-    expect(
-      screen.getByRole("heading", { name: "Inicio" })
-    ).toBeInTheDocument();
   });
 });

@@ -62,49 +62,7 @@ describe("Componente AdminProductos", () => {
     ]);
   });
 
-  it("actualiza un producto existente", async () => {
-    const usuario = userEvent.setup();
-    const setProductos = vi.fn();
-
-    const producto = {
-      id: 5,
-      nombre: "Guitarra antigua",
-      categoria: "guitarras",
-      categoriaNombre: "Guitarras eléctricas",
-      precio: 300000,
-      stock: 4,
-      imagen: "",
-    };
-
-    render(
-      <AdminProductos
-        productos={[producto]}
-        setProductos={setProductos}
-      />
-    );
-
-    await usuario.click(
-      screen.getByRole("button", { name: /editar/i })
-    );
-
-    const campoNombre = screen.getByLabelText(
-      /nombre del producto/i
-    );
-
-    await usuario.clear(campoNombre);
-    await usuario.type(campoNombre, "Guitarra actualizada");
-
-    await usuario.click(
-      screen.getByRole("button", { name: /guardar cambios/i })
-    );
-
-    expect(setProductos).toHaveBeenCalledWith([
-      {
-        ...producto,
-        nombre: "Guitarra actualizada",
-      },
-    ]);
-  });
+ 
 
   it("elimina un producto del inventario", async () => {
     const usuario = userEvent.setup();
