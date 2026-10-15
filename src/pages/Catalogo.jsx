@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
+import { agregarProductoAlCarrito } from "../utils/carrito";
 
 
 function Catalogo({ productos, carrito, setCarrito }) {
@@ -22,23 +23,15 @@ function Catalogo({ productos, carrito, setCarrito }) {
 
   // Agrega un producto respetando el stock disponible
   function agregarAlCarrito(producto) {
-    const productoExistente = carrito.find((item) => item.id === producto.id);
+    const carritoActualizado = agregarProductoAlCarrito(carrito, producto);
 
-    if (productoExistente && productoExistente.cantidad >= producto.stock) {
+    // Comprueba si se pudo agregar el producto
+    if (carritoActualizado === carrito) {
       setMensaje(`No hay más stock disponible de ${producto.nombre}.`);
       return;
     }
 
-    let carritoActualizado;
-
-    if (productoExistente) {
-      carritoActualizado = carrito.map((item) =>
-        item.id === producto.id ? { ...item, cantidad: item.cantidad + 1 } : item
-      );
-    } else {
-      carritoActualizado = [...carrito, { ...producto, cantidad: 1 }];
-    }
-
+    // Actualiza el carrito y muestra el mensaje
     setCarrito(carritoActualizado);
     setMensaje(`${producto.nombre} fue agregado al carrito.`);
   }
