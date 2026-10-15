@@ -2,6 +2,9 @@
 import { useEffect, useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 
+
+import { validarProducto } from "../../utils/validacionesInventarioProducto";
+
 const datosIniciales = {
   nombre: "",
   categoria: "",
@@ -36,26 +39,14 @@ function FormularioProducto({ onGuardar, onActualizar, productoEditando, onCance
 
   function enviarFormulario(evento) {
     evento.preventDefault();
-    const nuevosErrores = {};
-
-    if (datos.nombre.trim().length < 3) {
-      nuevosErrores.nombre = "El nombre debe tener al menos 3 caracteres.";
-    }
-
-    if (!datos.categoria) {
-      nuevosErrores.categoria = "Selecciona una categoría.";
-    }
-
-    if (datos.precio === "" || Number(datos.precio) < 0) {
-      nuevosErrores.precio = "El precio debe ser un número positivo.";
-    }
-
-    if (datos.stock === "" || Number(datos.stock) < 0) {
-      nuevosErrores.stock = "El stock no puede ser negativo.";
-    }
-
+    
+    // 1. Usamos tu función ultra robusta para validar los datos
+    const nuevosErrores = validarProducto(datos);
+    
+    // 2. Guardamos los errores para que se pinten de rojo en la pantalla
     setErrores(nuevosErrores);
 
+    // 3. Si hay al menos un error, detenemos el guardado
     if (Object.keys(nuevosErrores).length > 0) return;
 
     // Obtener el nombre visible de la categoría para el catálogo
@@ -65,6 +56,7 @@ function FormularioProducto({ onGuardar, onActualizar, productoEditando, onCance
       microfonos: "Micrófonos",
     };
 
+    // 4. Si todo está perfecto, armamos el objeto
     const productoProcesado = {
       nombre: datos.nombre.trim(),
       categoria: datos.categoria,

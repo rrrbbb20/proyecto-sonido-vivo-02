@@ -2,16 +2,15 @@ import { useState } from "react";
 import { Container, Row, Col } from "react-bootstrap";
 import FormularioProducto from "./FormularioProducto";
 import ListaProductos from "./ListaProductos";
-
+import { calcularNuevoId } from "../../utils/inventario";
 function AdminProductos({ productos, setProductos }) {
   const [productoEditando, setProductoEditando] = useState(null);
 
 function guardarProducto(nuevoProducto) {
-    let nuevoId = 1;
-    for (const prod of productos) {
-      if (prod.id >= nuevoId) nuevoId = prod.id + 1;
-    }
+    // Usamos nuestra calculadora externa para obtener el ID
+    const nuevoId = calcularNuevoId(productos);
     
+    // Guardamos el producto con su nuevo ID
     setProductos([...productos, { ...nuevoProducto, id: nuevoId }]);
   }
 
