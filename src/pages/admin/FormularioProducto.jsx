@@ -1,30 +1,53 @@
-
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Button, Row, Col } from "react-bootstrap";
 import { validarProducto } from "../../utils/validacionesInventarioProducto";
 
 const datosIniciales = {
   nombre: "",
   categoria: "",
+  marca: "",
+  modelo: "",
+  descripcionBreve: "",
   precio: "",
   stock: "",
   imagen: "",
 };
 
-function FormularioProducto({ onGuardar }) {
+function FormularioProducto({
+  onGuardar,
+  onActualizar,
+  productoEditando,
+  onCancelarEdicion,
+  guardando = false,
+}) {
   const [datos, setDatos] = useState(datosIniciales);
   const [errores, setErrores] = useState({});
 
+  useEffect(() => {
+    if (productoEditando) {
+      setDatos({
+        nombre: productoEditando.nombre || "",
+        categoria: productoEditando.categoria || "",
+        marca: productoEditando.marca || "",
+        modelo: productoEditando.modelo || "",
+        descripcionBreve: productoEditando.descripcionBreve || "",
+        precio: productoEditando.precio ?? "",
+        stock: productoEditando.stock ?? "",
+        imagen: productoEditando.imagen || "",
+      });
+    } else {
+      setDatos(datosIniciales);
+    }
+    setErrores({});
+  }, [productoEditando]);
+
   function cambiarCampo(evento) {
     const { name, value } = evento.target;
-
-    setDatos((datosAnteriores) => ({
-      ...datosAnteriores,
-      [name]: value,
-    }));
+    setDatos((prev) => ({ ...prev, [name]: value }));
+    setErrores((prev) => ({ ...prev, [name]: "" }));
   }
 
-  function enviarFormulario(evento) {
+  async function enviarFormulario(evento) {
     evento.preventDefault();
 
     const nuevosErrores = validarProducto(datos);
@@ -34,38 +57,37 @@ function FormularioProducto({ onGuardar }) {
       return;
     }
 
-    const nombresCategorias = {
-      guitarras: "Guitarras eléctricas",
-      baterias: "Baterías",
-      microfonos: "Micrófonos",
-    };
-
-    const productoProcesado = {
+    const payload = {
+      categoria: datos.categoria.trim(),
       nombre: datos.nombre.trim(),
-      categoria: datos.categoria,
-      categoriaNombre: nombresCategorias[datos.categoria],
+      marca: datos.marca.trim(),
+      modelo: datos.modelo.trim(),
+      descripcionBreve: datos.descripcionBreve.trim(),
       precio: Number(datos.precio),
       stock: Number(datos.stock),
       imagen: datos.imagen.trim(),
     };
 
-    onGuardar(productoProcesado);
+    const exito = productoEditando
+      ? await onActualizar(productoEditando.id, payload)
+      : await onGuardar(payload);
 
-    setDatos({ ...datosIniciales });
-    setErrores({});
+    if (exito) {
+      setDatos(datosIniciales);
+      setErrores({});
+    }
   }
 
   return (
     <Form onSubmit={enviarFormulario} noValidate>
-      <h2 className="h4 mb-3">Registrar producto</h2>
+      <h2 className="h4 mb-3">
+        {productoEditando ? "Editar producto" : "Registrar producto"}
+      </h2>
 
       <Row className="g-3">
         <Col xs={12}>
           <Form.Group>
-            <Form.Label htmlFor="nombre">
-              Nombre del producto
-            </Form.Label>
-
+            <Form.Label htmlFor="nombre">Nombre del producto</Form.Label>
             <Form.Control
               id="nombre"
               type="text"
@@ -74,19 +96,121 @@ function FormularioProducto({ onGuardar }) {
               onChange={cambiarCampo}
               isInvalid={Boolean(errores.nombre)}
             />
-
             <Form.Control.Feedback type="invalid">
               {errores.nombre}
             </Form.Control.Feedback>
           </Form.Group>
         </Col>
 
+        <Col xs={12} md={6}>
+          <Form.Group>
+            <Form.Label htmlFor="marca">Marca</Form.Label>
+            <Form.Control
+              id="marca"
+              type="text"
+              name="marca"
+              placeholder="Ej: Fender, Pearl..."
+              value={datos.marca}
+              onChange={cambiarCampo}
+              isInvalid={Boolean(errores.marca)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errores.marca}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+
+        <Col xs={12} md={6}>
+          <Form.Group>
+            <Form.Label htmlFor="modelo">Modelo</Form.Label>
+            <Form.Control
+              id="modelo"
+              type="text"
+              name="modelo"
+              placeholder="Ej: Stratocaster, AT2020..."
+              value={datos.modelo}
+              onChange={cambiarCampo}
+              isInvalid={Boolean(errores.modelo)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errores.modelo}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+
+        <Col xs={12} md={4}>
+          <Form.Group>
+            <Form.Label htmlFor="categoria">Categoría</Form.Label>
+            <Form.Select
+              id="categoria"
+              name="categoria"
+              value={datos.categoria}
+              onChange={cambiarCampo}
+              isInvalid={Boolean(errores.categoria)}
+            >
+              <option value="">Seleccionar...</option>
+              <option value="Guitarras">Guitarras</option>
+              <option value="Baterías">Baterías</option>
+              <option value="Micrófonos">Micrófonos</option>
+              <option value="Audio">Audio</option>
+            </Form.Select>
+            <Form.Control.Feedback type="invalid">
+              {errores.categoria}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+
+        <Col xs={12} md={4}>
+          <Form.Group>
+            <Form.Label htmlFor="precio">Precio ($)</Form.Label>
+            <Form.Control
+              id="precio"
+              type="number"
+              name="precio"
+              value={datos.precio}
+              onChange={cambiarCampo}
+              isInvalid={Boolean(errores.precio)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errores.precio}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+
+        <Col xs={12} md={4}>
+          <Form.Group>
+            <Form.Label htmlFor="stock">Stock</Form.Label>
+            <Form.Control
+              id="stock"
+              type="number"
+              name="stock"
+              value={datos.stock}
+              onChange={cambiarCampo}
+              isInvalid={Boolean(errores.stock)}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errores.stock}
+            </Form.Control.Feedback>
+          </Form.Group>
+        </Col>
+
         <Col xs={12}>
           <Form.Group>
-            <Form.Label htmlFor="imagen">
-              URL de la imagen
-            </Form.Label>
+            <Form.Label htmlFor="descripcionBreve">Descripción breve</Form.Label>
+            <Form.Control
+              id="descripcionBreve"
+              as="textarea"
+              rows={2}
+              name="descripcionBreve"
+              value={datos.descripcionBreve}
+              onChange={cambiarCampo}
+            />
+          </Form.Group>
+        </Col>
 
+        <Col xs={12}>
+          <Form.Group>
+            <Form.Label htmlFor="imagen">URL de la imagen</Form.Label>
             <Form.Control
               id="imagen"
               type="text"
@@ -97,75 +221,27 @@ function FormularioProducto({ onGuardar }) {
             />
           </Form.Group>
         </Col>
-
-        <Col xs={12} md={4}>
-          <Form.Group>
-            <Form.Label htmlFor="categoria">
-              Categoría
-            </Form.Label>
-
-            <Form.Select
-              id="categoria"
-              name="categoria"
-              value={datos.categoria}
-              onChange={cambiarCampo}
-              isInvalid={Boolean(errores.categoria)}
-            >
-              <option value="">Seleccionar...</option>
-              <option value="guitarras">Guitarras</option>
-              <option value="baterias">Baterías</option>
-              <option value="microfonos">Micrófonos</option>
-            </Form.Select>
-
-            <Form.Control.Feedback type="invalid">
-              {errores.categoria}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
-
-        <Col xs={12} md={4}>
-          <Form.Group>
-            <Form.Label htmlFor="precio">Precio ($)</Form.Label>
-
-            <Form.Control
-              id="precio"
-              type="number"
-              name="precio"
-              value={datos.precio}
-              onChange={cambiarCampo}
-              isInvalid={Boolean(errores.precio)}
-            />
-
-            <Form.Control.Feedback type="invalid">
-              {errores.precio}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
-
-        <Col xs={12} md={4}>
-          <Form.Group>
-            <Form.Label htmlFor="stock">Stock</Form.Label>
-
-            <Form.Control
-              id="stock"
-              type="number"
-              name="stock"
-              value={datos.stock}
-              onChange={cambiarCampo}
-              isInvalid={Boolean(errores.stock)}
-            />
-
-            <Form.Control.Feedback type="invalid">
-              {errores.stock}
-            </Form.Control.Feedback>
-          </Form.Group>
-        </Col>
       </Row>
 
       <div className="d-flex gap-2 flex-wrap mt-4">
-        <Button type="submit" variant="primary">
-          Registrar producto
+        <Button type="submit" variant="primary" disabled={guardando}>
+          {guardando
+            ? "Guardando..."
+            : productoEditando
+            ? "Guardar cambios"
+            : "Registrar producto"}
         </Button>
+
+        {productoEditando && (
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onCancelarEdicion}
+            disabled={guardando}
+          >
+            Cancelar edición
+          </Button>
+        )}
       </div>
     </Form>
   );

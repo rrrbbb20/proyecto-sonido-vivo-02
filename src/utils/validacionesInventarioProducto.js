@@ -1,31 +1,30 @@
-// src/utils/validacionesInventarioProducto.js
-
-// Valida los datos ingresados en el formulario del inventario.
 export function validarProducto(datos) {
   const nuevosErrores = {};
 
-  // El nombre debe tener al menos 3 caracteres.
-  if (datos.nombre.trim().length < 3) {
-    nuevosErrores.nombre =
-      "El nombre debe tener al menos 3 caracteres.";
+  if (!datos.nombre || datos.nombre.trim().length < 3) {
+    nuevosErrores.nombre = "El nombre debe tener al menos 3 caracteres.";
   }
 
-  // La categoría es obligatoria.
-  if (!datos.categoria) {
+  if (!datos.categoria || !datos.categoria.trim()) {
     nuevosErrores.categoria = "Selecciona una categoría.";
   }
 
-  // El precio debe ser un número mayor que cero.
+  if (!datos.marca || !datos.marca.trim()) {
+    nuevosErrores.marca = "La marca es obligatoria.";
+  }
+
+  if (!datos.modelo || !datos.modelo.trim()) {
+    nuevosErrores.modelo = "El modelo es obligatorio.";
+  }
+
   if (
     datos.precio === "" ||
     !Number.isFinite(Number(datos.precio)) ||
-    Number(datos.precio) <= 0
+    Number(datos.precio) < 0
   ) {
-    nuevosErrores.precio =
-      "El precio debe ser un número mayor que cero.";
+    nuevosErrores.precio = "El precio debe ser un número mayor o igual a cero.";
   }
 
-  // El stock debe ser un número entero mayor o igual a cero.
   if (
     datos.stock === "" ||
     !Number.isFinite(Number(datos.stock)) ||
