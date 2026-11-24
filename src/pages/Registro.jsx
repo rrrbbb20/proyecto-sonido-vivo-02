@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Container, Form, Button, Alert, Row, Col, Card } from "react-bootstrap";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import CampoFormulario from "../components/CampoFormulario";
-import { validarRegistro } from "../utils/validacionesRegistro"; 
+import { validarRegistro } from "../utils/validacionesRegistro";
+import { registrarClientePerfil } from "../services/clienteService";
 
 const datosIniciales = {
   nombre: "",
@@ -14,12 +15,18 @@ const datosIniciales = {
   terminos: false,
 };
 
-function Registro({ usuarios, setUsuarios }) {
+function Registro({ sesion, setSesion }) {
   const [datos, setDatos] = useState(datosIniciales);
   const [errores, setErrores] = useState({});
+  const [errorServidor, setErrorServidor] = useState("");
   const [mensaje, setMensaje] = useState("");
-  
+  const [cargando, setCargando] = useState(false);
+
   const navegar = useNavigate();
+
+  if (sesion?.token) {
+    return <Navigate to="/" replace />;
+  }
 
   function cambiarCampo(evento) {
     const { name, value, type, checked } = evento.target;
@@ -31,42 +38,62 @@ function Registro({ usuarios, setUsuarios }) {
       ...erroresAnteriores,
       [name]: "",
     }));
+    setErrorServidor("");
     setMensaje("");
   }
 
-  function enviarFormulario(evento) {
+  async function enviarFormulario(evento) {
     evento.preventDefault();
     setMensaje("");
+    setErrorServidor("");
 
-    const nuevosErrores = validarRegistro(datos, usuarios);
+    const nuevosErrores = validarRegistro(datos);
     setErrores(nuevosErrores);
 
     if (Object.keys(nuevosErrores).length > 0) {
       return;
     }
 
-    const nuevoUsuario = {
+    const payload = {
       nombre: datos.nombre.trim(),
       apellido: datos.apellido.trim(),
-      rut: datos.rut.trim(),
+      rut: datos.rut.trim().toUpperCase(),
       correo: datos.correo.trim().toLowerCase(),
       telefono: datos.telefono.trim(),
       contrasena: datos.contrasena,
-      rol: "cliente",
     };
 
-    setUsuarios((usuariosAnteriores) => [
-      ...usuariosAnteriores,
-      nuevoUsuario,
-    ]);
+    try {
+      setCargando(true);
+      const respuesta = await registrarClientePerfil(payload);
 
-    setDatos({ ...datosIniciales });
-    setErrores({});
-    setMensaje("¡Registro completado correctamente! Redirigiendo...");
-    
-    setTimeout(() => {
-      navegar("/");
-    }, 2000);
+      const nuevaSesion = {
+        idUsuario: respuesta.usuarioId,
+        clienteId: respuesta.id,
+        nombre: respuesta.nombre,
+        apellido: respuesta.apellido,
+        correo: respuesta.correo,
+        rol: respuesta.rol,
+        token: respuesta.token,
+      };
+
+      sessionStorage.setItem("sesionSonidoVivo", JSON.stringify(nuevaSesion));
+      if (setSesion) {
+        setSesion(nuevaSesion);
+      }
+
+      setDatos({ ...datosIniciales });
+      setErrores({});
+      setMensaje("¡Registro completado correctamente! Redirigiendo...");
+
+      setTimeout(() => {
+        navegar("/");
+      }, 1500);
+    } catch (error) {
+      setErrorServidor(error.message);
+    } finally {
+      setCargando(false);
+    }
   }
 
   return (
@@ -75,6 +102,12 @@ function Registro({ usuarios, setUsuarios }) {
         <Card.Body className="p-4 p-md-5">
           <h2 className="mb-4 text-center fw-bold">Crear cuenta</h2>
 
+          {errorServidor && (
+            <Alert variant="danger" role="alert" className="text-center">
+              {errorServidor}
+            </Alert>
+          )}
+
           {mensaje && (
             <Alert variant="success" role="status" className="text-center">
               {mensaje}
@@ -82,8 +115,6 @@ function Registro({ usuarios, setUsuarios }) {
           )}
 
           <Form onSubmit={enviarFormulario} noValidate>
-            
-            {/* xs=12 (Celular: 100%), md=12 (Tablet: 100%), lg=6 (PC: 50%) */}
             <Row className="g-3 mb-3">
               <Col xs={12} md={12} lg={6}>
                 <CampoFormulario
@@ -107,7 +138,6 @@ function Registro({ usuarios, setUsuarios }) {
               </Col>
             </Row>
 
-            {/* xs=12 (Celular: 100%), md=12 (Tablet: 100%), lg=6 (PC: 50%) */}
             <Row className="g-3 mb-3">
               <Col xs={12} md={12} lg={6}>
                 <CampoFormulario
@@ -169,8 +199,14 @@ function Registro({ usuarios, setUsuarios }) {
               feedbackType="invalid"
             />
 
-            <Button variant="primary" type="submit" size="lg" className="w-100 fw-bold shadow-sm">
-              Registrarme
+            <Button
+              variant="primary"
+              type="submit"
+              size="lg"
+              className="w-100 fw-bold shadow-sm"
+              disabled={cargando}
+            >
+              {cargando ? "Registrando..." : "Registrarme"}
             </Button>
           </Form>
 

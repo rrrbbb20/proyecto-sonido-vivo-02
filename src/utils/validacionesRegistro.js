@@ -1,4 +1,3 @@
-
 // src/utils/validacionesRegistro.js
 
 // Valida el RUT chileno mediante módulo 11.
@@ -53,7 +52,7 @@ export function validarContrasena(contrasena) {
 }
 
 // Valida todos los campos del formulario de registro.
-export function validarRegistro(datos, usuarios) {
+export function validarRegistro(datos, usuarios = []) {
   const nuevosErrores = {};
 
   if (!datos.nombre.trim()) {
@@ -87,15 +86,17 @@ export function validarRegistro(datos, usuarios) {
       "Debes aceptar los términos y condiciones.";
   }
 
-  // Comprueba si el correo ya está registrado.
-  const correoExiste = usuarios.some(
-    (usuario) =>
-      usuario.correo.toLowerCase() ===
-      datos.correo.trim().toLowerCase()
-  );
+  // Comprueba si el correo ya está registrado (si se provee lista local).
+  if (Array.isArray(usuarios) && usuarios.length > 0) {
+    const correoExiste = usuarios.some(
+      (usuario) =>
+        usuario.correo.toLowerCase() ===
+        datos.correo.trim().toLowerCase()
+    );
 
-  if (correoExiste) {
-    nuevosErrores.correo = "Este correo ya está registrado.";
+    if (correoExiste) {
+      nuevosErrores.correo = "Este correo ya está registrado.";
+    }
   }
 
   return nuevosErrores;
