@@ -1,19 +1,20 @@
 import { Container, Form, Button, Alert, Row, Col } from "react-bootstrap";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { descontarStock, listarProductos } from "../services/productoService";
 
-function Confirmacion({ vaciarCarrito }) {
+function Confirmacion({ carrito, setCarrito, setProductos, sesion }) {
   const [pedidoConfirmado, setPedidoConfirmado] = useState(false);
+  const [procesando, setProcesando] = useState(false);
+  const [errorServidor, setErrorServidor] = useState("");
 
-  // 1. Creamos un estado para guardar todo lo que el usuario escriba
   const [datosEnvio, setDatosEnvio] = useState({
-    nombre: "",
+    nombre: sesion?.nombre ? `${sesion.nombre} ${sesion.apellido || ""}`.trim() : "",
     direccion: "",
     region: "",
-    comuna: ""
+    comuna: "",
   });
 
-  // Lista básica de regiones para mostrar en el menú desplegable
   const regionesChile = [
     "Región de Arica y Parinacota",
     "Región de Tarapacá",
@@ -30,26 +31,51 @@ function Confirmacion({ vaciarCarrito }) {
     "Región de Los Ríos",
     "Región de Los Lagos",
     "Región de Aysén del Gral. Carlos Ibáñez del Campo",
-    "Región de Magallanes y de la Antártica Chilena"
+    "Región de Magallanes y de la Antártica Chilena",
   ];
 
-  // 2. Esta función actualiza el estado automáticamente cada vez que se teclea algo
   function manejarCambio(evento) {
     const { name, value } = evento.target;
-    // Copia los datos actuales y actualiza solo el campo que se está modificando
     setDatosEnvio({ ...datosEnvio, [name]: value });
   }
 
-  // 3. Esta función se ejecuta al hacer clic en "Confirmar pedido"
-  function manejarConfirmacion(evento) {
+  async function manejarConfirmacion(evento) {
     evento.preventDefault();
-    
-    // Guardamos los datos en el LocalStorage del navegador
-    localStorage.setItem("datosEnvio", JSON.stringify(datosEnvio));
-    
-    setPedidoConfirmado(true);
-    if (vaciarCarrito) {
-      vaciarCarrito();
+    setErrorServidor("");
+
+    if (!sesion?.token) {
+      setErrorServidor("Debes iniciar sesión antes de confirmar tu compra.");
+      return;
+    }
+
+    if (!carrito || carrito.length === 0) {
+      setErrorServidor("Tu carrito está vacío.");
+      return;
+    }
+
+    try {
+      setProcesando(true);
+
+      for (const item of carrito) {
+        await descontarStock(item.id, item.cantidad);
+      }
+
+      const inventarioActualizado = await listarProductos();
+      if (setProductos && Array.isArray(inventarioActualizado)) {
+        setProductos(inventarioActualizado);
+      }
+
+      localStorage.setItem("datosEnvio", JSON.stringify(datosEnvio));
+
+      if (setCarrito) {
+        setCarrito([]);
+      }
+
+      setPedidoConfirmado(true);
+    } catch (error) {
+      setErrorServidor(error.message);
+    } finally {
+      setProcesando(false);
     }
   }
 
@@ -58,7 +84,9 @@ function Confirmacion({ vaciarCarrito }) {
       <Container className="py-5 text-center">
         <Alert variant="success">
           <h2>¡Pedido confirmado exitosamente!</h2>
-          <p>Tus datos de envío han sido guardados.</p>
+          <p className="mb-0">
+            El stock ha sido descontado del inventario y tus datos de envío fueron guardados.
+          </p>
         </Alert>
         <Link to="/catalogo" className="btn btn-primary mt-3">
           Volver al catálogo
@@ -71,38 +99,59 @@ function Confirmacion({ vaciarCarrito }) {
     <Container className="py-4">
       <h1>Detalles de envío</h1>
       <p>Ingresa tus datos para finalizar la compra.</p>
-      
+
+      {!sesion?.token && (
+        <Alert variant="warning">
+          Para confirmar tu pedido debes{" "}
+          <Link to="/login" className="alert-link">
+            iniciar sesión
+          </Link>{" "}
+          o{" "}
+          <Link to="/registro" className="alert-link">
+            crear una cuenta
+          </Link>
+          .
+        </Alert>
+      )}
+
+      {errorServidor && <Alert variant="danger">{errorServidor}</Alert>}
+
       <Form onSubmit={manejarConfirmacion}>
         <Form.Group className="mb-3">
           <Form.Label>Nombre completo</Form.Label>
-          <Form.Control 
-            type="text" 
-            name="nombre" 
-            placeholder="Ej: Juan Pérez" 
-            onChange={manejarCambio} 
-            required 
+          <Form.Control
+            type="text"
+            name="nombre"
+            value={datosEnvio.nombre}
+            placeholder="Ej: Juan Pérez"
+            onChange={manejarCambio}
+            required
           />
         </Form.Group>
 
         <Form.Group className="mb-3">
           <Form.Label>Dirección de entrega (Calle y número)</Form.Label>
-          <Form.Control 
-            type="text" 
-            name="direccion" 
-            placeholder="Ej: Av. Siempreviva 742" 
-            onChange={manejarCambio} 
-            required 
+          <Form.Control
+            type="text"
+            name="direccion"
+            value={datosEnvio.direccion}
+            placeholder="Ej: Av. Siempreviva 742"
+            onChange={manejarCambio}
+            required
           />
         </Form.Group>
 
-        {/* Usamos Row y Col de Bootstrap para poner Región y Comuna uno al lado del otro en pantallas grandes */}
         <Row>
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Región</Form.Label>
-              <Form.Select name="region" onChange={manejarCambio} required>
+              <Form.Select
+                name="region"
+                value={datosEnvio.region}
+                onChange={manejarCambio}
+                required
+              >
                 <option value="">Selecciona tu región...</option>
-                {/* Recorremos el arreglo de regiones para crear las opciones */}
                 {regionesChile.map((region) => (
                   <option key={region} value={region}>
                     {region}
@@ -111,23 +160,29 @@ function Confirmacion({ vaciarCarrito }) {
               </Form.Select>
             </Form.Group>
           </Col>
-          
+
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Comuna</Form.Label>
-              <Form.Control 
-                type="text" 
-                name="comuna" 
-                placeholder="Ej: La Florida" 
-                onChange={manejarCambio} 
-                required 
+              <Form.Control
+                type="text"
+                name="comuna"
+                value={datosEnvio.comuna}
+                placeholder="Ej: La Florida"
+                onChange={manejarCambio}
+                required
               />
             </Form.Group>
           </Col>
         </Row>
 
-        <Button variant="success" type="submit" className="w-100 mt-3">
-          Confirmar pedido
+        <Button
+          variant="success"
+          type="submit"
+          className="w-100 mt-3"
+          disabled={procesando || !sesion?.token || carrito.length === 0}
+        >
+          {procesando ? "Procesando pedido..." : "Confirmar pedido"}
         </Button>
       </Form>
     </Container>

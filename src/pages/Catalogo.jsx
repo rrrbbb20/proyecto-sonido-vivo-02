@@ -2,36 +2,34 @@ import { useState } from "react";
 import { Container, Form, Row, Col, Button } from "react-bootstrap";
 import { agregarProductoAlCarrito } from "../utils/carrito";
 
-
 function Catalogo({ productos, carrito, setCarrito }) {
   const [busqueda, setBusqueda] = useState("");
   const [categoria, setCategoria] = useState("");
   const [mensaje, setMensaje] = useState("");
 
-  // Filtra los productos según búsqueda y categoría
   const productosFiltrados = productos.filter((producto) => {
-    const coincideBusqueda = producto.nombre.toLowerCase().includes(busqueda.toLowerCase());
-    const coincideCategoria = categoria === "" || producto.categoria === categoria;
+    const coincideBusqueda = producto.nombre
+      .toLowerCase()
+      .includes(busqueda.toLowerCase());
+    const coincideCategoria =
+      categoria === "" ||
+      producto.categoria?.toLowerCase() === categoria.toLowerCase();
     return coincideBusqueda && coincideCategoria;
   });
 
-  // Restablece los filtros
   function limpiarFiltros() {
     setBusqueda("");
     setCategoria("");
   }
 
-  // Agrega un producto respetando el stock disponible
   function agregarAlCarrito(producto) {
     const carritoActualizado = agregarProductoAlCarrito(carrito, producto);
 
-    // Comprueba si se pudo agregar el producto
     if (carritoActualizado === carrito) {
       setMensaje(`No hay más stock disponible de ${producto.nombre}.`);
       return;
     }
 
-    // Actualiza el carrito y muestra el mensaje
     setCarrito(carritoActualizado);
     setMensaje(`${producto.nombre} fue agregado al carrito.`);
   }
@@ -41,14 +39,12 @@ function Catalogo({ productos, carrito, setCarrito }) {
       <h1 className="mb-3">Catálogo</h1>
       <p className="mb-4">Explora nuestros instrumentos musicales y equipos de audio.</p>
 
-      {/* Muestra el resultado de la última acción */}
       {mensaje !== "" && (
         <div className="border rounded p-3 mb-4">
           <p className="fw-bold mb-0">{mensaje}</p>
         </div>
       )}
 
-      {/* Controles de búsqueda y filtrado */}
       <Form className="border rounded p-3 mb-4">
         <Row className="g-3">
           <Col xs={12} md={6}>
@@ -63,11 +59,15 @@ function Catalogo({ productos, carrito, setCarrito }) {
 
           <Col xs={12} md={4}>
             <Form.Label>Categoría</Form.Label>
-            <Form.Select value={categoria} onChange={(evento) => setCategoria(evento.target.value)}>
+            <Form.Select
+              value={categoria}
+              onChange={(evento) => setCategoria(evento.target.value)}
+            >
               <option value="">Todas las categorías</option>
-              <option value="guitarras">Guitarras</option>
-              <option value="baterias">Baterías</option>
-              <option value="microfonos">Micrófonos</option>
+              <option value="Guitarras">Guitarras</option>
+              <option value="Baterías">Baterías</option>
+              <option value="Micrófonos">Micrófonos</option>
+              <option value="Audio">Audio</option>
             </Form.Select>
           </Col>
 
@@ -81,7 +81,6 @@ function Catalogo({ productos, carrito, setCarrito }) {
 
       <h2 className="mb-3">Productos</h2>
 
-      {/* Informa cuando no existen coincidencias */}
       {productosFiltrados.length === 0 ? (
         <div className="border rounded p-4 text-center">
           <p className="mb-3">No se encontraron productos con los filtros seleccionados.</p>
@@ -93,7 +92,6 @@ function Catalogo({ productos, carrito, setCarrito }) {
       ) : (
         <Row className="g-4">
           {productosFiltrados.map((producto) => {
-            // Calcula cuánto stock queda después de considerar el carrito
             const productoEnCarrito = carrito.find((item) => item.id === producto.id);
             const cantidadEnCarrito = productoEnCarrito ? productoEnCarrito.cantidad : 0;
             const stockDisponible = producto.stock - cantidadEnCarrito;
@@ -103,11 +101,12 @@ function Catalogo({ productos, carrito, setCarrito }) {
               <Col key={producto.id} xs={12} md={6} lg={4}>
                 <div className="border rounded p-3 h-100 d-flex flex-column">
                   <h3 className="h5">{producto.nombre}</h3>
-                  <p className="mb-2">Categoría: {producto.categoriaNombre}</p>
+                  <p className="mb-2">Categoría: {producto.categoria}</p>
                   <p className="mb-2">Stock disponible: {stockDisponible}</p>
-                  <p className="fw-bold mb-4">Precio: ${producto.precio.toLocaleString('es-CL')}</p>
+                  <p className="fw-bold mb-4">
+                    Precio: ${producto.precio.toLocaleString("es-CL")}
+                  </p>
 
-                  {/* Bloquea nuevas unidades cuando no queda stock */}
                   <Button
                     variant="primary"
                     className="w-100 mt-auto"
