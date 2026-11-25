@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import Cabecera from "./components/Cabecera";
 import Navegacion from "./components/Navegacion";
 import RutaProtegida from "./components/RutaProtegida";
 import Inicio from "./pages/Inicio";
@@ -17,7 +16,6 @@ import Admin from "./pages/admin/Admin";
 import AdminProductos from "./pages/admin/AdminProductos";
 import DetalleProducto from "./pages/DetalleProducto";
 import { listarProductos } from "./services/productoService";
-import AdminContactos from "./pages/admin/AdminContactos";
 
 function App() {
   // Recupera el carrito guardado al cargar la aplicación
@@ -66,23 +64,19 @@ function App() {
   useEffect(() => {
     setCarrito((carritoAnterior) => {
       const carritoActualizado = carritoAnterior.map((productoCarrito) => {
-        // Busca el producto actualizado en el inventario
         const productoInventario = productos.find(
           (producto) => producto.id === productoCarrito.id
         );
 
-        // Quita productos eliminados o sin stock
         if (!productoInventario || productoInventario.stock <= 0) {
           return null;
         }
 
-        // Ajusta la cantidad si supera el stock actual
         const cantidadActualizada =
           productoCarrito.cantidad > productoInventario.stock
             ? productoInventario.stock
             : productoCarrito.cantidad;
 
-        // Actualiza precio, stock y demás datos del producto
         return {
           ...productoCarrito,
           ...productoInventario,
@@ -90,7 +84,6 @@ function App() {
         };
       });
 
-      // Elimina los productos marcados como null
       return carritoActualizado.filter((producto) => producto !== null);
     });
   }, [productos]);
@@ -104,7 +97,11 @@ function App() {
 
   return (
     <>
-      <Navegacion cantidadCarrito={cantidadCarrito} />
+      <Navegacion
+        cantidadCarrito={cantidadCarrito}
+        sesion={sesion}
+        setSesion={setSesion}
+      />
 
       <main className="container py-4 mb-5">
         {errorProductos && (
@@ -114,23 +111,51 @@ function App() {
         )}
 
         <Routes>
-          <Route path="/" element={<Inicio productos={productos} carrito={carrito} setCarrito={setCarrito} />} />
-          <Route path="/registro" element={<Registro sesion={sesion} setSesion={setSesion} />} />
-          {/* anadir esto dentro de element de catalogo: 
-          <Catalogo productos={productos}*/}
-
-          <Route path="/catalogo" element={<Catalogo productos={productos} carrito={carrito} setCarrito={setCarrito} />} />
-          <Route path="/carrito" element={<Carrito carrito={carrito} setCarrito={setCarrito} />} />
-          {/* anadir esto dentro de element de login: 
-          <Route path="/login" element={<Login usuarios={usuarios} />}/>*/}
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <Inicio
+                productos={productos}
+                carrito={carrito}
+                setCarrito={setCarrito}
+              />
+            }
+          />
+          <Route
+            path="/registro"
+            element={<Registro sesion={sesion} setSesion={setSesion} />}
+          />
+          <Route
+            path="/catalogo"
+            element={
+              <Catalogo
+                productos={productos}
+                carrito={carrito}
+                setCarrito={setCarrito}
+              />
+            }
+          />
+          <Route
+            path="/carrito"
+            element={<Carrito carrito={carrito} setCarrito={setCarrito} />}
+          />
+          <Route
+            path="/login"
+            element={<Login sesion={sesion} setSesion={setSesion} />}
+          />
 
           {/* Rutas administrativas protegidas */}
-          <Route path="/admin/login" element={<LoginAdmin sesion={sesion} setSesion={setSesion} />} />
+          <Route
+            path="/admin/login"
+            element={<LoginAdmin sesion={sesion} setSesion={setSesion} />}
+          />
           <Route
             path="/admin/panel"
             element={
-              <RutaProtegida sesion={sesion} rolesPermitidos={["VENDEDOR", "ADMINISTRADOR"]}>
+              <RutaProtegida
+                sesion={sesion}
+                rolesPermitidos={["VENDEDOR", "ADMINISTRADOR"]}
+              >
                 <PanelAdmin sesion={sesion} setSesion={setSesion} />
               </RutaProtegida>
             }
@@ -138,8 +163,15 @@ function App() {
           <Route
             path="/admin/productos"
             element={
-              <RutaProtegida sesion={sesion} rolesPermitidos={["VENDEDOR", "ADMINISTRADOR"]}>
-                <AdminProductos productos={productos} setProductos={setProductos} sesion={sesion} />
+              <RutaProtegida
+                sesion={sesion}
+                rolesPermitidos={["VENDEDOR", "ADMINISTRADOR"]}
+              >
+                <AdminProductos
+                  productos={productos}
+                  setProductos={setProductos}
+                  sesion={sesion}
+                />
               </RutaProtegida>
             }
           />
@@ -151,17 +183,19 @@ function App() {
               </RutaProtegida>
             }
           />
-          <Route
-            path="/admin/contactos"
-            element={
-              <RutaProtegida sesion={sesion} rolesPermitidos={["ADMINISTRADOR"]}>
-                <AdminContactos />
-              </RutaProtegida>
-            }
-          />
           <Route path="/admin" element={<Navigate to="/admin/panel" replace />} />
 
-          <Route path="/confirmacion" element={<Confirmacion />} />
+          <Route
+            path="/confirmacion"
+            element={
+              <Confirmacion
+                carrito={carrito}
+                setCarrito={setCarrito}
+                setProductos={setProductos}
+                sesion={sesion}
+              />
+            }
+          />
           <Route path="/contacto" element={<Contacto />} />
           <Route path="/ubicacion" element={<Ubicacion />} />
 

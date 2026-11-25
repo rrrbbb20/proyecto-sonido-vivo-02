@@ -1,24 +1,28 @@
 import { useEffect, useState } from "react";
-import { Container, Row, Col } from "react-bootstrap";
+import { Container, Row, Col, Alert } from "react-bootstrap";
+import { Link } from "react-router-dom";
 import FormularioTrabajador from "./FormularioTrabajador";
 import ListaTrabajadores from "./ListaTrabajadores";
+import { registrarTrabajador } from "../../services/authService";
 
-function Admin() {
-  // Recupera los trabajadores guardados
+function Admin({ sesion }) {
   const [trabajadores, setTrabajadores] = useState(() => {
     const guardados = localStorage.getItem("trabajadoresSonidoVivo");
     return guardados ? JSON.parse(guardados) : [];
   });
 
-  // Guarda el trabajador seleccionado para edición
   const [trabajadorEditando, setTrabajadorEditando] = useState(null);
+  const [errorServidor, setErrorServidor] = useState("");
+  const [exito, setExito] = useState("");
 
-  // Mantiene los trabajadores sincronizados con localStorage
   useEffect(() => {
     localStorage.setItem("trabajadoresSonidoVivo", JSON.stringify(trabajadores));
   }, [trabajadores]);
 
-  function guardarTrabajador(trabajador) {
+  async function guardarTrabajador(trabajador) {
+    setErrorServidor("");
+    setExito("");
+
     const correoExiste = trabajadores.some(
       (item) => item.correo === trabajador.correo
     );
@@ -27,27 +31,25 @@ function Admin() {
       return false;
     }
 
-    // Genera un identificador mayor a los trabajadores existentes
-    let nuevoId = 1;
+    try {
+      const creadoBackend = await registrarTrabajador(trabajador, sesion?.token);
 
-    for (const trabajadorGuardado of trabajadores) {
-      if (trabajadorGuardado.id >= nuevoId) {
-        nuevoId = trabajadorGuardado.id + 1;
-      }
+      const nuevoTrabajador = {
+        id: creadoBackend?.idUsuario || Date.now(),
+        nombre: trabajador.nombre,
+        apellido: trabajador.apellido,
+        correo: trabajador.correo,
+        direccion: trabajador.direccion,
+        rol: trabajador.rol,
+      };
+
+      setTrabajadores((prev) => [...prev, nuevoTrabajador]);
+      setExito("Trabajador registrado correctamente en el servicio de autenticación.");
+      return true;
+    } catch (error) {
+      setErrorServidor(error.message);
+      return false;
     }
-
-    // La contraseña se valida, pero no se almacena
-    const nuevoTrabajador = {
-      id: nuevoId,
-      nombre: trabajador.nombre,
-      apellido: trabajador.apellido,
-      correo: trabajador.correo,
-      direccion: trabajador.direccion,
-      rol: trabajador.rol,
-    };
-
-    setTrabajadores([...trabajadores, nuevoTrabajador]);
-    return true;
   }
 
   function editarTrabajador(trabajador) {
@@ -65,18 +67,14 @@ function Admin() {
       return false;
     }
 
-    // Reemplaza solamente al trabajador editado
-    const trabajadoresActualizados = trabajadores.map((trabajador) => {
-      if (trabajador.id === trabajadorActualizado.id) {
-        return trabajadorActualizado;
-      }
-
-      return trabajador;
-    });
+    const trabajadoresActualizados = trabajadores.map((trabajador) =>
+      trabajador.id === trabajadorActualizado.id
+        ? trabajadorActualizado
+        : trabajador
+    );
 
     setTrabajadores(trabajadoresActualizados);
     setTrabajadorEditando(null);
-
     return true;
   }
 
@@ -85,11 +83,7 @@ function Admin() {
   }
 
   function eliminarTrabajador(id) {
-    const trabajadoresActualizados = trabajadores.filter(
-      (trabajador) => trabajador.id !== id
-    );
-
-    setTrabajadores(trabajadoresActualizados);
+    setTrabajadores((prev) => prev.filter((trabajador) => trabajador.id !== id));
 
     if (trabajadorEditando && trabajadorEditando.id === id) {
       setTrabajadorEditando(null);
@@ -98,13 +92,20 @@ function Admin() {
 
   return (
     <Container className="py-4">
-      <h1 className="mb-3">Administración</h1>
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1 className="mb-0">Administración</h1>
+        <Link to="/admin/panel" className="btn btn-outline-secondary">
+          &larr; Volver al panel
+        </Link>
+      </div>
 
       <p className="mb-4">
         Registra y administra trabajadores de Sonido Vivo.
       </p>
 
-      {/* Una columna en móvil y dos columnas en escritorio */}
+      {errorServidor && <Alert variant="danger">{errorServidor}</Alert>}
+      {exito && <Alert variant="success">{exito}</Alert>}
+
       <Row className="g-4">
         <Col xs={12} lg={5}>
           <div className="border rounded p-4 h-100">

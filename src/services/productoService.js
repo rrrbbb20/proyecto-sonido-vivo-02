@@ -1,4 +1,3 @@
-
 import {
   procesarRespuesta,
   obtenerHeadersAuth,
@@ -64,5 +63,21 @@ export async function eliminarProducto(id) {
   return procesarRespuesta(
     response,
     "Error al eliminar el producto."
+  );
+}
+
+// Descontar stock al confirmar una compra
+export async function descontarStock(id, cantidad) {
+  const response = await fetch(
+    `${PRODUCTOS_URL}/${id}/descontar-stock?cantidad=${cantidad}`,
+    {
+      method: "PUT",
+      headers: obtenerHeadersAuth(false),
+    }
+  );
+
+  return procesarRespuesta(
+    response,
+    "No se pudo descontar el stock del producto."
   );
 }

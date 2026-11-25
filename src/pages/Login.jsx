@@ -1,39 +1,45 @@
 import { useState } from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Container, Row, Col, Form, Button, Alert } from "react-bootstrap";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { loginUsuario } from "../services/authService";
+import { obtenerPerfilPorUsuarioId } from "../services/clienteService";
 
-function Login() {
-  // Datos ingresados en el formulario
+function Login({ sesion, setSesion }) {
   const [datos, setDatos] = useState({
     correo: "",
     contrasena: "",
   });
 
   const [errores, setErrores] = useState({});
-  const [mensaje, setMensaje] = useState("");
+  const [errorServidor, setErrorServidor] = useState("");
+  const [cargando, setCargando] = useState(false);
 
-  // Actualiza el campo correspondiente
-  function cambiarCampo(evento) {
-    const { name, value } = evento.target;
-    setDatos({ ...datos, [name]: value });
+  const navegar = useNavigate();
+
+  if (sesion?.token) {
+    return <Navigate to="/" replace />;
   }
 
-  // Valida los datos antes de aceptar el formulario
-  function enviarFormulario(evento) {
+  function cambiarCampo(evento) {
+    const { name, value } = evento.target;
+    setDatos((prev) => ({ ...prev, [name]: value }));
+    setErrores((prev) => ({ ...prev, [name]: "" }));
+    setErrorServidor("");
+  }
+
+  async function enviarFormulario(evento) {
     evento.preventDefault();
 
     const nuevosErrores = {};
     const correo = datos.correo.trim().toLowerCase();
     const contrasena = datos.contrasena;
 
-    // Validación del correo
     if (correo === "") {
       nuevosErrores.correo = "Ingresa tu correo electrónico.";
     } else if (!correo.includes("@")) {
       nuevosErrores.correo = "Ingresa un correo electrónico válido.";
     }
 
-    // Validación de la contraseña
     if (contrasena === "") {
       nuevosErrores.contrasena = "Ingresa tu contraseña.";
     } else if (contrasena.length < 8 || contrasena.length > 12) {
@@ -41,37 +47,74 @@ function Login() {
     }
 
     setErrores(nuevosErrores);
-    setMensaje("");
+    setErrorServidor("");
 
     if (Object.keys(nuevosErrores).length > 0) {
       return;
     }
 
-    setMensaje("Los datos ingresados cumplen con las validaciones.");
-    setDatos({ correo: "", contrasena: "" });
+    try {
+      setCargando(true);
+      const dataAuth = await loginUsuario(correo, contrasena);
+
+      let nuevaSesion = {
+        idUsuario: dataAuth.idUsuario,
+        correo: dataAuth.correo,
+        rol: dataAuth.rol,
+        token: dataAuth.token,
+      };
+
+      sessionStorage.setItem("sesionSonidoVivo", JSON.stringify(nuevaSesion));
+
+      if (dataAuth.rol === "CLIENTE") {
+        try {
+          const perfil = await obtenerPerfilPorUsuarioId(dataAuth.idUsuario);
+          nuevaSesion = {
+            ...nuevaSesion,
+            clienteId: perfil.id,
+            nombre: perfil.nombre,
+            apellido: perfil.apellido,
+            rut: perfil.rut,
+            telefono: perfil.telefono,
+          };
+          sessionStorage.setItem("sesionSonidoVivo", JSON.stringify(nuevaSesion));
+        } catch {
+          // Si no tiene perfil asociado aún, conserva la sesión base de Auth
+        }
+      }
+
+      if (setSesion) {
+        setSesion(nuevaSesion);
+      }
+
+      navegar("/catalogo");
+    } catch (error) {
+      setErrorServidor(error.message);
+    } finally {
+      setCargando(false);
+    }
   }
 
   return (
     <Container className="py-4">
-      {/* Centra el formulario y adapta su ancho según la pantalla */}
       <Row className="justify-content-center">
         <Col xs={12} md={8} lg={5}>
-          <div className="border rounded p-4">
+          <div className="border rounded p-4 shadow-sm bg-white">
             <h1 className="mb-3">Iniciar sesión</h1>
 
-            <p className="mb-4">
+            <p className="mb-4 text-muted">
               Ingresa tus datos para acceder a tu cuenta.
             </p>
 
-            {/* Mensaje mostrado después de una validación correcta */}
-            {mensaje !== "" && (
-              <p className="text-success fw-bold">{mensaje}</p>
+            {errorServidor && (
+              <Alert variant="danger" role="alert">
+                {errorServidor}
+              </Alert>
             )}
 
             <Form onSubmit={enviarFormulario} noValidate>
               <Form.Group className="mb-3">
                 <Form.Label>Correo electrónico</Form.Label>
-
                 <Form.Control
                   type="email"
                   name="correo"
@@ -80,7 +123,6 @@ function Login() {
                   placeholder="correo@ejemplo.cl"
                   isInvalid={Boolean(errores.correo)}
                 />
-
                 <Form.Control.Feedback type="invalid">
                   {errores.correo}
                 </Form.Control.Feedback>
@@ -88,7 +130,6 @@ function Login() {
 
               <Form.Group className="mb-4">
                 <Form.Label>Contraseña</Form.Label>
-
                 <Form.Control
                   type="password"
                   name="contrasena"
@@ -96,14 +137,18 @@ function Login() {
                   onChange={cambiarCampo}
                   isInvalid={Boolean(errores.contrasena)}
                 />
-
                 <Form.Control.Feedback type="invalid">
                   {errores.contrasena}
                 </Form.Control.Feedback>
               </Form.Group>
 
-              <Button type="submit" variant="primary" className="w-100">
-                Ingresar
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-100"
+                disabled={cargando}
+              >
+                {cargando ? "Ingresando..." : "Ingresar"}
               </Button>
             </Form>
 
