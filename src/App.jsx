@@ -17,6 +17,7 @@ import Admin from "./pages/admin/Admin";
 import AdminProductos from "./pages/admin/AdminProductos";
 import DetalleProducto from "./pages/DetalleProducto";
 import { listarProductos } from "./services/productoService";
+import AdminContactos from "./pages/admin/AdminContactos";
 
 function App() {
   // Recupera el carrito guardado al cargar la aplicación
@@ -147,6 +148,14 @@ function App() {
             element={
               <RutaProtegida sesion={sesion} rolesPermitidos={["ADMINISTRADOR"]}>
                 <Admin sesion={sesion} />
+              </RutaProtegida>
+            }
+          />
+          <Route
+            path="/admin/contactos"
+            element={
+              <RutaProtegida sesion={sesion} rolesPermitidos={["ADMINISTRADOR"]}>
+                <AdminContactos />
               </RutaProtegida>
             }
           />
